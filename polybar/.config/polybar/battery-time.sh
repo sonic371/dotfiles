@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Get battery info from upower
+get_battery_info() {
+    upower -i /org/freedesktop/UPower/devices/battery_BAT0 2>/dev/null
+}
+
+# Format time from seconds to H:MM or HH:MM
+format_time() {
+    local total_seconds="$1"
+
+    if [ -z "$total_seconds" ] || [ "$total_seconds" -eq 0 ]; then
+        echo ""
+        return
+    fi
+
+    local hours=$((total_seconds / 3600))
+    local minutes=$(((total_seconds % 3600) / 60))
+
+    # Format as H:MM or HH:MM (no leading zero for hours)
+    printf "%d:%02d" $hours $minutes
+}
+
+# Get battery icon based on percentage
+get_battery_icon() {
+    local percentage="$1"
+    local state="$2"
+
+    # Charging - use 󱐋
+    if [ "$state" = "charging" ]; then
+        echo "󱐋"
+    # Discharging/static icons
+    else
+        if [ "$percentage" -lt 20 ]; then
+            echo "󰂎"
+        elif [ "$percentage" -lt 40 ]; then
+            echo "󱊡"
+        elif [ "$percentage" -lt 60 ]; then
+            echo "󱊢"
+        else
+            echo "󱊣"
+        fi
+    fi
+}
+
+# Main script
+battery_info=$(get_battery_info)
+
+# Get percentage
+percentage=$(echo "$battery_info" | grep "percentage:" | awk '{print $2}' | sed 's/%//')
+percentage_num=$(echo "$percentage" | sed 's/%//')
+
+# Get state (charging, discharging, etc.)
+state=$(echo "$battery_info" | grep "state:" | awk '{print $2}')
+
+# Get energy rate (power flow in watts)
+energy_rate=$(echo "$battery_info" | grep "energy-rate:" | awk '{print $2}' | sed 's/[^0-9.]//g')
+
+# Get time to empty/full in seconds
+if [ "$state" = "discharging" ]; then
+    time_field=$(echo "$battery_info" | grep "time to empty:")
+    time_value=$(echo "$time_field" | awk '{print $4}')
+    time_unit=$(echo "$time_field" | awk '{print $5}')
+elif [ "$state" = "charging" ]; then
+    time_field=$(echo "$battery_info" | grep "time to full:")
+    time_value=$(echo "$time_field" | awk '{print $4}')
+    time_unit=$(echo "$time_field" | awk '{print $5}')
+else
+    time_value=""
+    time_unit=""
+fi
+
+# Convert time to seconds based on unit
+if [ -n "$time_value" ] && [ -n "$time_unit" ]; then
+    if echo "$time_unit" | grep -qi "hour"; then
+        # Convert hours to seconds: hours * 3600
+        time_seconds=$(echo "$time_value" | awk '{printf "%.0f", $1 * 3600}')
+    elif echo "$time_unit" | grep -qi "minute"; then
+        # Convert minutes to seconds: minutes * 60
+        time_seconds=$(echo "$time_value" | awk '{printf "%.0f", $1 * 60}')
+    else
+        # Assume already in seconds
+        time_seconds=$(echo "$time_value" | awk '{printf "%.0f", $1}')
+    fi
+else
+    time_seconds=""
+fi
+
+# Format time
+formatted_time=$(format_time "$time_seconds")
+
+# Get battery icon
+icon=$(get_battery_icon "$percentage_num" "$state")
+
+# Output based on state
+if [ "$percentage_num" -eq 100 ]; then
+    echo "$icon $percentage% (Full)"
+elif [ -n "$formatted_time" ] && [ -n "$energy_rate" ] && [ "$(echo "$energy_rate" | awk '{print ($1 > 0)}')" -eq 1 ]; then
+    echo "$icon $percentage% ($formatted_time)"
+elif [ -n "$energy_rate" ] && [ "$(echo "$energy_rate" | awk '{print ($1 == 0)}')" -eq 1 ]; then
+    echo "$icon $percentage% (Idle)"
+else
+    echo "$icon $percentage%"
+fi

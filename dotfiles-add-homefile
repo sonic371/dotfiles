@@ -1,0 +1,42 @@
+#!/bin/bash
+# Specifically for dotfiles in home directory (.zshrc, .bashrc, etc.)
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <filename>"
+    echo "Examples:"
+    echo "  $0 .zshrc"
+    echo "  $0 .bashrc"
+    echo "  $0 .gitconfig"
+    exit 1
+fi
+
+FILENAME="$1"
+SOURCE="$HOME/$FILENAME"
+DOTFILES="$HOME/dotfiles"
+CONFIG_NAME="${FILENAME#.}"  # Remove leading dot
+
+if [ ! -f "$SOURCE" ]; then
+    echo "Error: $SOURCE does not exist"
+    exit 1
+fi
+
+echo "Adding $FILENAME to dotfiles..."
+
+# Create directory structure
+mkdir -p "$DOTFILES/$CONFIG_NAME"
+cp "$SOURCE" "$DOTFILES/$CONFIG_NAME/$FILENAME"
+
+# Backup and create symlink
+mv "$SOURCE" "${SOURCE}.backup.$(date +%s)"
+cd "$DOTFILES"
+stow -v -t ~ "$CONFIG_NAME"
+
+# Git
+if [ -d "$DOTFILES/.git" ]; then
+    git add "$CONFIG_NAME/"
+    git commit -m "add: $FILENAME"
+fi
+
+echo "✅ $FILENAME added!"
+echo "   File at: $DOTFILES/$CONFIG_NAME/$FILENAME"
+echo "   Symlink at: $HOME/$FILENAME"

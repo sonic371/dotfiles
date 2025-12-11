@@ -63,15 +63,16 @@ detect_config_path() {
         "$HOME/.${config_name}_config"
         "$HOME/$config_name"
     )
-    
+
     for path in "${possible_paths[@]}"; do
         if [ -e "$path" ]; then
             echo "$path"
             return 0
         fi
     done
-    
-    return 1
+
+    # Return empty string instead of failing
+    echo ""
 }
 
 detect_stow_structure() {
@@ -98,10 +99,18 @@ detect_stow_structure() {
 backup_existing() {
     local target_path="$1"
     local backup_path="${target_path}.backup.$(date +%Y%m%d_%H%M%S)"
-    
+
+    # Use atomic mv if possible, otherwise copy then remove
     if [ -e "$target_path" ]; then
         print_warning "Backing up existing: $target_path → $backup_path"
-        mv "$target_path" "$backup_path"
+        if ! mv "$target_path" "$backup_path" 2>/dev/null; then
+            # If mv fails (e.g., across filesystems), copy then remove
+            if [ -d "$target_path" ]; then
+                cp -r "$target_path" "$backup_path" && rm -rf "$target_path"
+            else
+                cp "$target_path" "$backup_path" && rm -f "$target_path"
+            fi
+        fi
         echo "Original saved to: $backup_path"
     fi
 }
@@ -118,10 +127,12 @@ add_config() {
     print_success "Creating: $dotfiles_path"
     mkdir -p "$(dirname "$dotfiles_path")"
     
-    # Copy files
+    # Copy files - always copy to the exact dotfiles_path
     if [ -d "$config_path" ]; then
         print_success "Copying directory: $config_path"
-        cp -r "$config_path" "$(dirname "$dotfiles_path")/"
+        # For directories, copy contents to dotfiles_path
+        mkdir -p "$dotfiles_path"
+        cp -r "$config_path"/. "$dotfiles_path"/
     elif [ -f "$config_path" ]; then
         print_success "Copying file: $config_path"
         cp "$config_path" "$dotfiles_path"
@@ -183,16 +194,42 @@ main() {
         echo "  - ~/.$CONFIG_NAME"
         echo "  - ~/.${CONFIG_NAME}rc"
         echo ""
-        echo "Please specify full path:"
-        read -r full_path
-        config_path="$full_path"
+
+        # Get and validate user input
+        while true; do
+            echo "Please specify full path:"
+            read -r full_path
+
+            # Basic validation: check if path exists and is within user's home
+            if [ -z "$full_path" ]; then
+                print_error "No path provided. Try again or press Ctrl+C to cancel."
+                continue
+            fi
+
+            # Expand ~ and variables
+            full_path=$(eval echo "$full_path")
+
+            # Check if path exists
+            if [ ! -e "$full_path" ]; then
+                print_error "Path does not exist: $full_path"
+                continue
+            fi
+
+            # Check if path is within user's home directory (security)
+            if [[ "$full_path" != "$HOME"/* ]] && [[ "$full_path" != "$HOME" ]]; then
+                print_warning "Warning: Path is outside your home directory: $full_path"
+                read -p "Continue anyway? (y/N): " -n 1 -r
+                echo ""
+                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                    continue
+                fi
+            fi
+
+            config_path="$full_path"
+            break
+        done
     else
         print_success "Found at: $config_path"
-    fi
-    
-    if [ ! -e "$config_path" ]; then
-        print_error "Path does not exist: $config_path"
-        exit 1
     fi
     
     # Ask for confirmation

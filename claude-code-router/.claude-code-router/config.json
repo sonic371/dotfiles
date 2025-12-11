@@ -1,0 +1,24 @@
+{
+  "LOG": false,
+  "OPENAI_API_KEY": "",
+  "OPENAI_BASE_URL": "",
+  "OPENAI_MODEL": "",
+  "Providers": [
+    {
+      "name": "deepseek",
+      "api_base_url": "https://api.deepseek.com/chat/completions",
+      "api_key": "sk-0ebda4704fae4b54a123040d24e559d2",
+      "models": [
+        "deepseek-chat"
+      ],
+      "transformer": {
+        "use": [
+          ["maxtoken", { "max_tokens": 8000 }]
+        ]
+      }
+    }
+  ],
+  "Router": {
+    "default": "deepseek,deepseek-chat"
+  }
+}

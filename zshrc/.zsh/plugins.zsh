@@ -13,12 +13,12 @@ source "$ZSH/oh-my-zsh.sh"
 
 # fzf Integration
 # Use system-provided fzf files if available
-if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
-  source /usr/share/doc/fzf/examples/key-bindings.zsh
+if [ -f ~/.zsh/fzf/completion.zsh ]; then
+  source ~/.zsh/fzf/completion.zsh
 fi
 
-if [ -f /usr/share/doc/fzf/examples/completion.zsh ]; then
-  source /usr/share/doc/fzf/examples/completion.zsh
+if [ -f ~/.zsh/fzf/key-bindings.zsh ]; then
+  source ~/.zsh/fzf/key-bindings.zsh
 fi
 
 # zoxide

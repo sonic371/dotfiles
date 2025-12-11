@@ -1,8 +1,7 @@
 # File listing aliases
 alias ls='eza'
-alias ll='eza -alF'      # Use eza instead of ls for consistency
-alias la='eza -A'
-alias l='eza -CF'
+alias la='eza -la'
+alias lt='eza --all --long  --tree --level 3 --group-directories-first'
 
 # Utilities aliases
 alias grep='rg'

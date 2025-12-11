@@ -1,0 +1,68 @@
+#!/bin/bash
+# Smart deployment script for new machines
+
+set -e
+
+DOTFILES="$HOME/dotfiles"
+BACKUP_DIR="$HOME/config-backup-$(date +%Y%m%d_%H%M%S)"
+
+echo "🚀 Deploying dotfiles..."
+echo "========================="
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+cd "$DOTFILES"
+
+for package in */; do
+    package=${package%/}
+    
+    # Skip .git or other non-package directories
+    if [[ "$package" == ".git" ]] || [[ ! -d "$package" ]]; then
+        continue
+    fi
+    
+    echo ""
+    echo "📦 Package: $package"
+    
+    # Find all files this package would create
+    find "$package" -type f | while read -r file; do
+        # Calculate target path
+        target_file="${file#$package/}"
+        target_path="$HOME/$target_file"
+        
+        # Check if file exists and is not a symlink
+        if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
+            echo "  ⚠  Conflict: $target_file"
+            
+            # Backup existing file
+            backup_path="$BACKUP_DIR/$target_file"
+            mkdir -p "$(dirname "$backup_path")"
+            cp -r "$target_path" "$backup_path"
+            echo "     Backed up to: $backup_path"
+            
+            # Remove or rename the conflicting file
+            if [ -f "$target_path" ]; then
+                mv "$target_path" "${target_path}.old"
+            elif [ -d "$target_path" ]; then
+                mv "$target_path" "${target_path}.old"
+            fi
+        fi
+    done
+    
+    # Deploy the package
+    echo "  📤 Deploying..."
+    if stow -t ~ "$package"; then
+        echo "  ✅ Successfully deployed $package"
+    else
+        echo "  ❌ Failed to deploy $package"
+    fi
+done
+
+echo ""
+echo "🎉 Deployment complete!"
+echo ""
+echo "📁 Backups saved to: $BACKUP_DIR"
+echo ""
+echo "To restore any backup:"
+echo "  cp -r $BACKUP_DIR/path/to/file ~/original/location/"

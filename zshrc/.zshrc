@@ -107,3 +107,4 @@ fi
 bindkey '^I^I' autosuggest-accept  # Double-tap Tab to accept
 
 ulimit -n 8192
+eval "$(ssh-agent -s)"

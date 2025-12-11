@@ -1,0 +1,40 @@
+#!/bin/bash
+# Quick dotfiles adder - minimal version
+
+DOTFILES="$HOME/dotfiles"
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <config-name> [source-path]"
+    echo "Examples:"
+    echo "  $0 polybar"
+    echo "  $0 i3 ~/.config/i3"
+    echo "  $0 zsh ~/.zshrc"
+    exit 1
+fi
+
+CONFIG="$1"
+SOURCE="${2:-$HOME/.config/$CONFIG}"
+
+# Create dotfiles structure
+echo "Adding $CONFIG from $SOURCE"
+mkdir -p "$DOTFILES/$CONFIG/.config/$CONFIG"
+
+# Copy files
+if [ -f "$SOURCE" ]; then
+    cp "$SOURCE" "$DOTFILES/$CONFIG/.config/$CONFIG/"
+else
+    cp -r "$SOURCE/." "$DOTFILES/$CONFIG/.config/$CONFIG/"
+fi
+
+# Backup and stow
+mv "$SOURCE" "${SOURCE}.backup.$(date +%s)"
+cd "$DOTFILES"
+stow -t ~ "$CONFIG"
+
+# Git if available
+if [ -d "$DOTFILES/.git" ]; then
+    git add "$CONFIG/"
+    git commit -m "add: $CONFIG configuration"
+fi
+
+echo "Done! $CONFIG added to dotfiles."

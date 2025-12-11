@@ -1,0 +1,15 @@
+#!/bin/bash
+# Restore from backup
+CONFIG="$1"
+BACKUP=$(find ~/.config -name "$CONFIG.backup.*" | sort -r | head -1)
+
+if [ -z "$BACKUP" ]; then
+    echo "No backup found for $CONFIG"
+    exit 1
+fi
+
+echo "Restoring $CONFIG from $BACKUP"
+cd ~/dotfiles
+stow -t ~ -D "$CONFIG"  # Remove symlinks
+mv "$BACKUP" ~/.config/"$CONFIG"
+echo "Restored!"

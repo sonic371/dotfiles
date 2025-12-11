@@ -1,0 +1,77 @@
+! ============================================
+! XTerm Configuration - Enhanced Classic Feel
+! ============================================
+
+! === TERMINAL SETTINGS ===
+! Enable 256 colors
+! XTerm*termName: xterm-256color
+
+! Fix backspace behavior (sends ^? instead of ^H)
+XTerm*vt100.backarrowKey: false
+XTerm*vt100.ttyModes: erase ^?
+
+! Make Alt key behave like other terminals (sends escape)
+XTerm*vt100.metaSendsEscape: true
+
+! UTF-8 support (ensure your locale is UTF-8)
+XTerm*vt100.locale: false
+XTerm*vt100.utf8: true
+
+! === SCROLLING & BUFFER ===
+! Increase scrollback buffer (default is 1024)
+XTerm*vt100.saveLines: 10000
+
+! Enable scrollbar
+XTerm*vt100.scrollBar: true
+XTerm*vt100.scrollbar.width: 12
+
+! Smooth scrolling
+XTerm*vt100.jumpScroll: false
+XTerm*vt100.fastScroll: false
+
+! === FONT SETTINGS ===
+! Use TrueType fonts (choose one of these)
+! Option 1: Classic fixed-width with anti-aliasing
+! XTerm*faceName: DejaVu Sans Mono:size=11:antialias=true
+! Option 2: More retro bitmap style
+! XTerm*font: 7x13
+! XTerm*boldFont: 7x13bold
+
+! === COLOR THEME ===
+XTerm*foreground: white
+XTerm*background: black
+
+! Disable anti-aliasing for faster rendering
+XTerm*renderFont: false
+
+! === WINDOW SETTINGS ===
+! Initial geometry (columns x rows)
+! XTerm*vt100.geometry: 88x25
+
+! Enable window transparency (requires compositor like xcompmgr)
+! XTerm*background: rgba:00/00/00/0.9
+
+! Bell settings
+XTerm*vt100.bellIsUrgent: true
+XTerm*vt100.visualBell: true
+
+! === KEY BINDINGS ===
+! Add useful keybindings
+XTerm*vt100.translations: #override \
+    Ctrl <Key>M: maximize() \n\
+    Ctrl <Key>R: restore() \n\
+    Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+    Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
+    Ctrl <Key>plus: larger-vt-font() \n\
+    Ctrl <Key>minus: smaller-vt-font() \n\
+    Ctrl <Key>0: set-vt-font(d)
+
+! === ADVANCED ===
+! Use CLIPBOARD for selections (not just PRIMARY)
+XTerm*vt100.selectToClipboard: true
+
+! Copy to both PRIMARY and CLIPBOARD on selection
+XTerm*vt100.translations: #override \
+    <BtnUp>: select-end(PRIMARY, CLIPBOARD) \n\
+    Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+    Ctrl Shift <Key>V: insert-selection(CLIPBOARD)

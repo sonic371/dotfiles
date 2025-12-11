@@ -7,7 +7,7 @@
     {
       "name": "deepseek",
       "api_base_url": "https://api.deepseek.com/chat/completions",
-      "api_key": "sk-0ebda4704fae4b54a123040d24e559d2",
+      "api_key": "yourapikey",
       "models": [
         "deepseek-chat"
       ],

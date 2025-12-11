@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:davatorium.github.io)"
-    ],
-    "deny": [],
-    "ask": []
-  }
-}

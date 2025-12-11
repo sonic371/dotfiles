@@ -1,0 +1,246 @@
+/******************************************************************************
+ * ROFI Color theme - Windows 98 Style (Fixed)
+ * User: wade
+ * Description: Retro Windows 98 style theme for Rofi
+ ******************************************************************************/
+
+* {
+    /* Windows 98 Color Palette */
+    background-color:      rgba(192, 192, 192, 100%); /* Classic Windows gray */
+    border-color:          rgba(0, 0, 0, 100%);
+    text-color:           rgba(0, 0, 0, 100%);
+
+    /* Windows 98 specific colors */
+    foreground:                  rgba(0, 0, 0, 100%);
+    normal-foreground:           var(foreground);
+    alternate-normal-background: rgba(192, 192, 192, 100%);
+    red:                         rgba(255, 0, 0, 100%);
+    blue:                        rgba(0, 0, 255, 100%);
+    urgent-foreground:           rgba(255, 0, 0, 100%);
+    alternate-urgent-background: rgba(192, 192, 192, 100%);
+    active-foreground:           rgba(0, 0, 0, 100%);
+    lightbg:                     rgba(255, 255, 255, 100%);
+    alternate-active-background: rgba(192, 192, 192, 100%);
+    background:                  rgba(192, 192, 192, 100%);
+    border-color:                rgba(0, 0, 0, 100%);
+    alternate-normal-foreground: var(foreground);
+    normal-background:           rgba(192, 192, 192, 100%);
+    lightfg:                     rgba(128, 128, 128, 100%);
+    selected-normal-background:  rgba(0, 0, 128, 100%); /* Windows blue */
+    spacing:                     2;
+    separatorcolor:              rgba(128, 128, 128, 100%);
+    urgent-background:           rgba(192, 192, 192, 100%);
+    selected-urgent-background:  rgba(255, 0, 0, 100%);
+    alternate-urgent-foreground: var(urgent-foreground);
+    background-color:            rgba(192, 192, 192, 100%);
+    alternate-active-foreground: var(active-foreground);
+    active-background:           rgba(192, 192, 192, 100%);
+    selected-active-background:  rgba(0, 0, 128, 100%);
+
+    /* Selected foreground colors */
+    selected-normal-foreground:  rgba(255, 255, 255, 100%);
+    selected-urgent-foreground:  rgba(255, 255, 255, 100%);
+    selected-active-foreground:  rgba(255, 255, 255, 100%);
+
+    /* Windows 98 font */
+    font: "VGA 10";
+}
+
+window {
+    /* Windows 98 window style with authentic 3D border */
+    background-color: rgba(192, 192, 192, 100%);
+    border: 2px;
+    border-top-color: rgba(255, 255, 255, 100%);
+    border-left-color: rgba(255, 255, 255, 100%);
+    border-right-color: rgba(128, 128, 128, 100%);
+    border-bottom-color: rgba(128, 128, 128, 100%);
+    padding: 4px;
+    width: 600px;
+    height: 400px;
+}
+
+mainbox {
+    border:  0;
+    padding: 8px;
+    margin: 0;
+    background-color: rgba(192, 192, 192, 100%);
+}
+
+message {
+    border:       1px;
+    border-color: rgba(128, 128, 128, 100%);
+    padding:      4px;
+    background-color: rgba(192, 192, 192, 100%);
+}
+
+textbox {
+    text-color: var(foreground);
+}
+
+listview {
+    fixed-height: 0;
+    border:       1px;
+    border-top-color: rgba(128, 128, 128, 100%);
+    border-left-color: rgba(128, 128, 128, 100%);
+    border-right-color: rgba(255, 255, 255, 100%);
+    border-bottom-color: rgba(255, 255, 255, 100%);
+    spacing:      2px;
+    scrollbar:    false;
+    padding:      2px;
+    background-color: rgba(255, 255, 255, 100%);
+}
+
+element {
+    border:  0;
+    padding: 4px 8px;
+}
+
+element-text {
+    background-color: inherit;
+    text-color:       inherit;
+}
+
+element.normal.normal {
+    background-color: rgba(255, 255, 255, 100%);
+    text-color:       rgba(0, 0, 0, 100%);
+}
+
+element.normal.urgent {
+    background-color: rgba(255, 255, 255, 100%);
+    text-color:       rgba(255, 0, 0, 100%);
+}
+
+element.normal.active {
+    background-color: rgba(255, 255, 255, 100%);
+    text-color:       rgba(0, 0, 0, 100%);
+}
+
+element.selected.normal {
+    background-color: rgba(0, 0, 128, 100%);
+    text-color:       rgba(255, 255, 255, 100%);
+}
+
+element.selected.urgent {
+    background-color: rgba(255, 0, 0, 100%);
+    text-color:       rgba(255, 255, 255, 100%);
+}
+
+element.selected.active {
+    background-color: rgba(0, 0, 128, 100%);
+    text-color:       rgba(255, 255, 255, 100%);
+}
+
+element.alternate.normal {
+    background-color: rgba(240, 240, 240, 100%);
+    text-color:       rgba(0, 0, 0, 100%);
+}
+
+element.alternate.urgent {
+    background-color: rgba(240, 240, 240, 100%);
+    text-color:       rgba(255, 0, 0, 100%);
+}
+
+element.alternate.active {
+    background-color: rgba(240, 240, 240, 100%);
+    text-color:       rgba(0, 0, 0, 100%);
+}
+
+scrollbar {
+    /* Windows 98 scrollbar track */
+    width:        12px;
+    border:       1px;
+    border-top-color: rgba(255, 255, 255, 100%);
+    border-left-color: rgba(255, 255, 255, 100%);
+    border-right-color: rgba(128, 128, 128, 100%);
+    border-bottom-color: rgba(128, 128, 128, 100%);
+    handle-width: 8px;
+    padding:      0;
+    background-color: rgba(192, 192, 192, 100%);
+    handle-color: rgba(192, 192, 192, 100%);
+}
+
+mode-switcher {
+    border:       2px;
+    border-color: rgba(128, 128, 128, 100%);
+    background-color: rgba(192, 192, 192, 100%);
+}
+
+button {
+    /* Windows 98 button - unpressed state */
+    border: 1px;
+    border-top-color: rgba(255, 255, 255, 100%);
+    border-left-color: rgba(255, 255, 255, 100%);
+    border-right-color: rgba(128, 128, 128, 100%);
+    border-bottom-color: rgba(128, 128, 128, 100%);
+    padding: 2px 8px;
+    background-color: rgba(192, 192, 192, 100%);
+    text-color: rgba(0, 0, 0, 100%);
+    cursor: pointer;
+    spacing: 0;
+}
+
+button selected {
+    /* Windows 98 button - pressed state */
+    background-color: rgba(192, 192, 192, 100%);
+    text-color:       rgba(0, 0, 0, 100%);
+    border-top-color: rgba(128, 128, 128, 100%);
+    border-left-color: rgba(128, 128, 128, 100%);
+    border-right-color: rgba(255, 255, 255, 100%);
+    border-bottom-color: rgba(255, 255, 255, 100%);
+    padding: 3px 7px 1px 9px; /* Offset to simulate pressed effect */
+}
+
+inputbar {
+    spacing:    0;
+    text-color: var(normal-foreground);
+    padding:    4px;
+    background-color: rgba(192, 192, 192, 100%);
+    children:   [ prompt, textbox-prompt-colon, entry, case-indicator ];
+}
+
+case-indicator {
+    spacing:    0;
+    text-color: var(normal-foreground);
+}
+
+entry {
+    spacing:    0;
+    text-color: var(normal-foreground);
+    border: 1px;
+    border-top-color: rgba(128, 128, 128, 100%);
+    border-left-color: rgba(128, 128, 128, 100%);
+    border-right-color: rgba(255, 255, 255, 100%);
+    border-bottom-color: rgba(255, 255, 255, 100%);
+    padding: 2px 4px;
+    background-color: rgba(255, 255, 255, 100%);
+    cursor: text;
+    placeholder-color: rgba(128, 128, 128, 100%);
+    placeholder: "Type to filter";
+}
+
+prompt {
+    spacing:    0;
+    text-color: var(normal-foreground);
+    padding: 2px 4px;
+}
+
+textbox-prompt-colon {
+    expand:     false;
+    str:        ">";
+    margin:     0px 0.3em 0em 0em;
+    text-color: var(normal-foreground);
+}
+
+/* Windows 98 style buttons for mode switcher */
+button {
+    margin: 2px;
+}
+
+/* Title bar style (if supported) */
+#window-title {
+    background-color: rgba(0, 0, 128, 100%);
+    text-color: rgba(255, 255, 255, 100%);
+    padding: 2px 4px;
+    border: 1px;
+    border-color: rgba(128, 128, 128, 100%);
+}

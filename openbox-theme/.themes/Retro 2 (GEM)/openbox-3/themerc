@@ -1,0 +1,98 @@
+!! GEM style
+!! Made by Anna Schröder, ananymania@gmail.com
+!! Font size: 10px 
+!! Button order: CIMl
+#=========================================
+
+!! Window Layout:
+border.width: 1
+padding.height: 0
+padding.width: 0
+*.client.padding.height: 1
+*.client.padding.width: 1
+*.label.text.font: shadow=y:shadowtint=0:shadowoffset=-3
+*.label.bg: Gradient interlaced mirrorhorizontal flat border
+*.label.text.justify: Center
+*.title.bg: Solid Flat border
+*.handle.width:1
+*.handle.bg: Solid Flat
+*.grip.bg: Solid Flat
+
+*.inactive.*.title.bg: Solid Flat border
+*.inactive.label.bg: Solid Flat
+
+#=========================================
+
+!! Window Colors:
+*.handle.*.color: Black
+*.grip.*.color: Black
+*.border.color: DimGray
+*.label.text.color: Black
+*.label.*.border.color: white
+*.client.color: Gainsboro
+*.separator.color: Black
+*.title.bg.color: Black
+*.label.bg.colorTo: White
+*.label.bg.color: DimGray
+*.label.bg.interlace.color: White
+
+*.title.bg.border.color: lightGray
+*.inactive.title.*.border.color: Gray
+*.inactive.label.bg.color: White
+*.inactive.label.text.color: Gray
+*.inactive.client.color: Gray
+
+#=========================================
+
+!! Button Layout:
+*.button.*.bg: Flat 
+#*.button.*.pressed.bg: Gradient MirrorHorizontal Flat
+#*.button.*.hover.bg: Gradient Vertical Flat 
+
+#*.inactive.button.*.bg: Flat ParentRelative
+
+#=========================================
+
+!!Button color: 
+*.image.color: Black
+*.button.*.bg.color: White
+#*.button.*.bg.colorTo: PaleGreen
+*.button.*.pressed.bg.color: Black
+*.button.*.pressed.image.color: White
+
+*.button.*.disabled.*.bg.color: Gray
+#*.button.*.disabled.*.bg.colorTo: LightGray
+
+#=========================================
+
+!! Menu section:
+menu.border.width: 1
+menu.overlap.x: 4
+menu.overlap.y: -2
+menu.separator.width: 1
+menu.*.font: shadow=y:shadowtint=0:shadowoffset=-5
+menu.title.text.justify: Center
+menu.items.bg: flat border
+menu.title.bg: ParentRelative
+menu.*.active.bg: Flat Solid
+
+menu.*.bg.border.color: white
+menu.*.text.color: black
+menu.*.bg.color: white
+menu.*.image.color: Gray
+menu.*.active.bg.color: DarkGray
+menu.*.active.text.color: White
+menu.*.disabled.text.color: Gray
+menu.separator.color: Gray
+
+#=========================================
+
+!! Dialog section:
+osd.border.width: 1
+osd.border.color: DarkGray
+osd.bg : Flat
+osd.*.button.*.bg: Flat Raised
+osd.*.button.bg.color: Gray
+osd.*.bg.color : LightGray
+osd.border.color : Black
+osd.*.text.color : Black

@@ -263,16 +263,16 @@ handle_conflicts() {
         return 1
     }
 
-    # Find files and write to temp file
-    find "$package" -type f 2>/dev/null > "$temp_file" || true
+    # Find all items (files and directories) and write to temp file
+    find "$package" -mindepth 1 2>/dev/null > "$temp_file" || true
 
-    while IFS= read -r file; do
-        local target_file="${file#$package/}"
-        local target_path="$TARGET_DIR/$target_file"
+    while IFS= read -r item; do
+        local target_item="${item#$package/}"
+        local target_path="$TARGET_DIR/$target_item"
 
-        # Check if file exists and is not a symlink
+        # Check if item exists and is not a symlink
         if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
-            conflicts+=("$target_file:$target_path")
+            conflicts+=("$target_item:$target_path")
         fi
     done < "$temp_file"
 
@@ -289,9 +289,9 @@ handle_conflicts() {
     local skipped_conflicts=0
 
     for conflict in "${conflicts[@]}"; do
-        local target_file="${conflict%%:*}"
+        local target_item="${conflict%%:*}"
         local target_path="${conflict#*:}"
-        local backup_path="$BACKUP_DIR/$target_file"
+        local backup_path="$BACKUP_DIR/$target_item"
 
         if [ "$AUTO_YES" = true ]; then
             # Auto-resolve: backup and remove
@@ -300,18 +300,18 @@ handle_conflicts() {
             ((resolved_conflicts++))
         elif [ "$NO_PROMPT" = true ]; then
             # Non-interactive: skip or fail
-            print_error "Conflict in non-interactive mode: $target_file"
+            print_error "Conflict in non-interactive mode: $target_item"
             ((skipped_conflicts++))
         else
             # Interactive mode
             echo ""
-            echo "Conflict: $target_file"
+            echo "Conflict: $target_item"
             echo "  Existing: $target_path"
-            echo "  Would be: $DOTFILES/$package/$target_file"
+            echo "  Would be: $DOTFILES/$package/$target_item"
             echo ""
             echo "Options:"
             echo "  1) Backup and remove (default)"
-            echo "  2) Skip this file"
+            echo "  2) Skip this item"
             echo "  3) Skip entire package"
             echo "  4) Abort deployment"
             echo "  5) Apply to all remaining conflicts"
@@ -326,7 +326,7 @@ handle_conflicts() {
                     ((resolved_conflicts++))
                     ;;
                 2)
-                    print_warning "Skipping file: $target_file"
+                    print_warning "Skipping item: $target_item"
                     ((skipped_conflicts++))
                     ;;
                 3)
@@ -341,9 +341,9 @@ handle_conflicts() {
                     # Apply to all remaining conflicts
                     print_warning "Applying option 1 (backup and remove) to ALL remaining conflicts"
                     for remaining_conflict in "${conflicts[@]:$resolved_conflicts}"; do
-                        local remaining_file="${remaining_conflict%%:*}"
+                        local remaining_item="${remaining_conflict%%:*}"
                         local remaining_path="${remaining_conflict#*:}"
-                        local remaining_backup="$BACKUP_DIR/$remaining_file"
+                        local remaining_backup="$BACKUP_DIR/$remaining_item"
                         atomic_backup "$remaining_path" "$remaining_backup"
                         atomic_remove "$remaining_path"
                     done
@@ -351,7 +351,7 @@ handle_conflicts() {
                     break  # Exit the loop
                     ;;
                 *)
-                    print_warning "Invalid option, skipping file: $target_file"
+                    print_warning "Invalid option, skipping item: $target_item"
                     ((skipped_conflicts++))
                     ;;
             esac
@@ -359,7 +359,7 @@ handle_conflicts() {
     done
 
     if [ $skipped_conflicts -gt 0 ]; then
-        print_warning "Skipped $skipped_conflicts conflict(s) for package: $package"
+        print_warning "Skipped $skipped_conflicts item(s) for package: $package"
     fi
 
     return 0

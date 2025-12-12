@@ -85,6 +85,14 @@ ${BOLD}Examples:${RESET}
   $(basename "$0") -t /custom/target  # Deploy to custom location
   $(basename "$0") --adopt            # Keep existing files with --adopt
 
+${BOLD}Conflict Resolution:${RESET}
+  In interactive mode, for each conflict you can choose:
+  1) Backup and remove (creates backup, removes original)
+  2) Skip this file (keeps original, no symlink)
+  3) Skip entire package (skip all files in this package)
+  4) Abort deployment (exit immediately)
+  5) Apply to all (apply option 1 to all remaining conflicts)
+
 ${BOLD}Environment:${RESET}
   DOTFILES    Directory containing dotfiles (default: ~/dotfiles)
 EOF
@@ -221,29 +229,22 @@ atomic_backup() {
     fi
 }
 
-# Atomic rename/move operation
-atomic_rename() {
-    local source_path="$1"
-    local dest_path="$2"
+# Atomic remove operation (after backup)
+atomic_remove() {
+    local target_path="$1"
 
     if [ "$DRY_RUN" = true ]; then
-        print_dry_run "Would rename: $source_path → $dest_path"
+        print_dry_run "Would remove: $target_path"
         return 0
     fi
 
-    # Use mv with backup if destination exists
-    if [ -e "$dest_path" ]; then
-        local counter=1
-        while [ -e "${dest_path}.old${counter}" ]; do
-            ((counter++))
-        done
-        dest_path="${dest_path}.old${counter}"
+    if rm -rf "$target_path" 2>/dev/null; then
+        OPERATIONS+=("remove:$target_path")
+        print_success "Removed: $target_path"
+    else
+        print_error "Failed to remove: $target_path"
+        return 1
     fi
-
-    mv "$source_path" "$dest_path" && {
-        OPERATIONS+=("rename:$source_path:$dest_path")
-        print_success "Renamed: $source_path → $dest_path"
-    }
 }
 
 # Handle conflicts for a package
@@ -290,9 +291,9 @@ handle_conflicts() {
         local backup_path="$BACKUP_DIR/$target_file"
 
         if [ "$AUTO_YES" = true ]; then
-            # Auto-resolve: backup and rename
+            # Auto-resolve: backup and remove
             atomic_backup "$target_path" "$backup_path"
-            atomic_rename "$target_path" "${target_path}.old"
+            atomic_remove "$target_path"
             ((resolved_conflicts++))
         elif [ "$NO_PROMPT" = true ]; then
             # Non-interactive: skip or fail
@@ -306,18 +307,19 @@ handle_conflicts() {
             echo "  Would be: $DOTFILES/$package/$target_file"
             echo ""
             echo "Options:"
-            echo "  1) Backup and rename to .old (default)"
+            echo "  1) Backup and remove (default)"
             echo "  2) Skip this file"
             echo "  3) Skip entire package"
             echo "  4) Abort deployment"
+            echo "  5) Apply to all remaining conflicts"
             echo ""
-            read -p "Choose option [1/2/3/4]: " -n 1 -r
+            read -p "Choose option [1/2/3/4/5]: " -n 1 -r
             echo ""
 
             case $REPLY in
                 1|"")
                     atomic_backup "$target_path" "$backup_path"
-                    atomic_rename "$target_path" "${target_path}.old"
+                    atomic_remove "$target_path"
                     ((resolved_conflicts++))
                     ;;
                 2)
@@ -331,6 +333,19 @@ handle_conflicts() {
                 4)
                     print_error "Deployment aborted by user"
                     exit 1
+                    ;;
+                5)
+                    # Apply to all remaining conflicts
+                    print_warning "Applying option 1 (backup and remove) to ALL remaining conflicts"
+                    for remaining_conflict in "${conflicts[@]:$resolved_conflicts}"; do
+                        local remaining_file="${remaining_conflict%%:*}"
+                        local remaining_path="${remaining_conflict#*:}"
+                        local remaining_backup="$BACKUP_DIR/$remaining_file"
+                        atomic_backup "$remaining_path" "$remaining_backup"
+                        atomic_remove "$remaining_path"
+                    done
+                    resolved_conflicts=${#conflicts[@]}  # All conflicts resolved
+                    break  # Exit the loop
                     ;;
                 *)
                     print_warning "Invalid option, skipping file: $target_file"
@@ -407,14 +422,15 @@ rollback_package() {
             "backup")
                 local source_path="${details%%:*}"
                 local backup_path="${details#*:}"
-                # Backup exists, nothing to rollback
-                ;;
-            "rename")
-                local source_path="${details%%:*}"
-                local dest_path="${details#*:}"
-                if [ -e "$dest_path" ]; then
-                    mv "$dest_path" "$source_path" 2>/dev/null && print_success "Restored: $source_path"
+                # During rollback, restore from backup if source doesn't exist
+                if [ ! -e "$source_path" ] && [ -e "$backup_path" ]; then
+                    cp -r "$backup_path" "$source_path" 2>/dev/null && print_success "Restored from backup: $source_path"
                 fi
+                ;;
+            "remove")
+                local target_path="$details"
+                # File was removed, restoration handled by backup operation
+                # (backup should always come before remove in operations list)
                 ;;
             "stow")
                 local stow_details="${details#*:}"

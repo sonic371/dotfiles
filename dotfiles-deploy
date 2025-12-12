@@ -8,7 +8,9 @@ set -e
 # Default configuration
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 TARGET_DIR="$HOME"
+TARGET_DIR=$(eval echo "$TARGET_DIR")  # Expand ~ and variables
 BACKUP_DIR="$HOME/config-backup-$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR=$(eval echo "$BACKUP_DIR")  # Expand ~ and variables
 DRY_RUN=false
 NO_PROMPT=false
 AUTO_YES=false
@@ -123,6 +125,7 @@ parse_args() {
                 ;;
             -t|--target)
                 TARGET_DIR="$2"
+                TARGET_DIR=$(eval echo "$TARGET_DIR")  # Expand ~ and variables
                 shift 2
                 ;;
             --no-backup)

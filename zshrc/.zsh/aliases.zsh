@@ -29,5 +29,5 @@ alias gst='git stash'
 alias gsp='git stash pop'
 
 # Dotfiles specific
-alias dots='cd ~/dotfiles'
-alias dotstatus='cd ~/dotfiles && git status'
+alias dot='cd ~/dotfiles'
+alias dots='cd ~/dotfiles && git status'

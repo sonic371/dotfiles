@@ -30,6 +30,6 @@ alias grs='git restore --staged'
 alias gst='git stash'
 alias gsp='git stash pop'
 
-# Dotfiles specific
+# Dotfiles navigation
 alias dot='cd ~/dotfiles'
 alias dots='cd ~/dotfiles && git status'

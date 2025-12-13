@@ -1,3 +1,7 @@
+# ============================================================================
+# CUSTOM SHELL FUNCTIONS
+# ============================================================================
+
 # Yazi file manager integration with directory changing
 y() {
     local tmp
@@ -24,6 +28,4 @@ c() {
 # fd/fdfind wrapper
 if (( ! $+commands[fd] && ! $+commands[fdfind] )); then
     echo "Warning: fd/fdfind not found. Install fd for better file searching."
-    # Optional: create a simple fd function using find
-    # fd() { find "$@" }
 fi

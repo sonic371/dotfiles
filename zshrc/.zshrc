@@ -2,7 +2,9 @@
 # Main ZSH configuration file
 # Sources all modular configuration files from ~/.zsh/
 
-# ===== Source modular configuration files =====
+# ============================================================================
+# SOURCE MODULAR CONFIGURATION FILES
+# ============================================================================
 # Source files if they exist
 [[ -f ~/.zsh/env.zsh ]] && source ~/.zsh/env.zsh
 [[ -f ~/.zsh/plugins.zsh ]] && source ~/.zsh/plugins.zsh
@@ -10,67 +12,101 @@
 [[ -f ~/.zsh/functions.zsh ]] && source ~/.zsh/functions.zsh
 [[ -f ~/.zsh/options.zsh ]] && source ~/.zsh/options.zsh
 
-# ===== Shell Options =====
-setopt auto_cd           # Enable auto cd (type directory name to cd)
-setopt share_history     # Share history between terminals
-setopt hist_ignore_all_dups  # Don't show duplicate history entries
+# ============================================================================
+# SHELL OPTIONS
+# ============================================================================
+# Note: Most shell options are configured in ~/.zsh/options.zsh
+# Keep only essential options that must be set early here
+setopt auto_cd  # Enable auto cd (type directory name to cd)
 
-# ===== Key bindings =====
-bindkey '^I^I' autosuggest-accept  # Double-tap Tab to accept
+# ============================================================================
+# KEY BINDINGS
+# ============================================================================
+bindkey '^I^I' autosuggest-accept  # Double-tap Tab to accept autosuggestion
 
-# ===== System settings =====
-ulimit -n 8192
+# ============================================================================
+# SYSTEM SETTINGS
+# ============================================================================
+ulimit -n 8192  # Increase file descriptor limit
 
-# ===================================
-# SSH Agent Setup - Simple & Reliable
-# ====================================
-
+# ============================================================================
+# SSH AGENT SETUP
+# ============================================================================
 if command -v keychain >/dev/null 2>&1; then
-    # tell keychain which keys you want
-    
+    # Tell keychain which keys to manage
     keychain --quiet ~/.ssh/id_ed25519
 
-    # source keychain env vars so that new shells know about the agent
-    # keychain writes these into ~/.keychain/$HOST-sh
+    # Source keychain environment variables
+    # Keychain writes these into ~/.keychain/$HOST-sh
     if [ -f "$HOME/.keychain/$HOST-sh" ]; then
         source "$HOME/.keychain/$HOST-sh"
     fi
 fi
 
-# ===== Reload function =====
+# ============================================================================
+# RELOAD FUNCTION
+# ============================================================================
 reload() {
-    source ~/.zshrc && echo "ZSH config reloaded"
+    source ~/.zshrc && echo "ZSH configuration reloaded"
 }
 
-# ============================================
-# DOTFILES MANAGEMENT ALIASES (WITH --adopt)
-# ============================================
+# ============================================================================
+# DOTFILES MANAGEMENT FUNCTIONS
+# ============================================================================
+# Note: Simple navigation aliases are in ~/.zsh/aliases.zsh
 
-# Navigation
-alias dots='cd ~/dotfiles'
+# Install all packages with adoption (takes over existing files)
+dots-install() {
+    cd ~/dotfiles && stow -t ~ --adopt */
+}
 
-# Installation with adoption (TAKES OVER existing files)
-alias dots-install='cd ~/dotfiles && stow -t ~ --adopt */'
-alias dots-adopt='dots-install'  # Alternative name
+# Force installation (overrides all conflicts)
+dots-force() {
+    cd ~/dotfiles && stow -t ~ --override=* */
+}
 
-# Force installation (even more aggressive)
-alias dots-force='cd ~/dotfiles && stow -t ~ --override=* */'
-
-# Removal
-alias dots-remove='cd ~/dotfiles && stow -D -t ~ */'
-alias dots-unstow='dots-remove'  # Alternative name
+# Remove all packages
+dots-remove() {
+    cd ~/dotfiles && stow -D -t ~ */
+}
 
 # Restow (remove + install with adoption)
-alias dots-restow='cd ~/dotfiles && stow -R -t ~ --adopt */'
+dots-restow() {
+    cd ~/dotfiles && stow -R -t ~ --adopt */
+}
 
 # Update from git and redeploy
-alias dots-update='cd ~/dotfiles && git pull && stow -R -t ~ --adopt */'
+dots-update() {
+    cd ~/dotfiles && git pull && stow -R -t ~ --adopt */
+}
 
 # List available packages
-alias dots-list='cd ~/dotfiles && echo "📦 Available packages:" && for p in */; do [ -d "$p" ] && [ "$p" != ".git/" ] && echo "  • ${p%/}"; done'
+dots-list() {
+    cd ~/dotfiles
+    echo "📦 Available packages:"
+    for p in */; do
+        [ -d "$p" ] && [ "$p" != ".git/" ] && echo "  • ${p%/}"
+    done
+}
 
 # Check status of packages
-alias dots-check='cd ~/dotfiles && echo "🔍 Checking symlinks..." && for pkg in */; do if [ -d "$pkg" ] && [ "$pkg" != ".git/" ]; then echo "\n${pkg%/}:"; find "$pkg" -type f | head -3 | while read f; do target="$HOME/${f#$pkg/}"; if [ -L "$target" ]; then echo "  ✅ ${f#$pkg/}"; else echo "  📄 ${f#$pkg/} (regular file)"; fi; done; fi; done'
+dots-check() {
+    cd ~/dotfiles
+    echo "🔍 Checking symlinks..."
+    for pkg in */; do
+        if [ -d "$pkg" ] && [ "$pkg" != ".git/" ]; then
+            echo "\n${pkg%/}:"
+            find "$pkg" -type f | head -3 | while read f; do
+                target="$HOME/${f#$pkg/}"
+                if [ -L "$target" ]; then
+                    echo "  ✅ ${f#$pkg/}"
+                else
+                    echo "  📄 ${f#$pkg/} (regular file)"
+                fi
+            done
+        fi
+    done
+}
 
 # Install specific packages with adoption
 dots-install-pkg() {

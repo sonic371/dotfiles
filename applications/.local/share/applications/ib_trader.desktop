@@ -1,0 +1,12 @@
+[Desktop Entry]
+
+# The type as listed above
+Type=Application
+
+# The name of the application
+Name=Ib_trader
+
+# The executable of the application, possibly with arguments.
+Exec=/home/wade/MEGA/Repos/IBKR/start_trader.sh
+
+Terminal=true

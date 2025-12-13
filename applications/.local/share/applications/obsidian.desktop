@@ -1,0 +1,4 @@
+[Desktop Entry]
+Name=Obsidian
+Exec=/opt/obsidian/Obsidian-1.9.10.AppImage %f
+Type=Application

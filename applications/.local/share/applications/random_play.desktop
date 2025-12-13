@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Random Play
+Comment=Random Play
+Exec=/home/wade/MEGA/Repos/random_play/start_random_play.sh
+Terminal=false
+Type=Application

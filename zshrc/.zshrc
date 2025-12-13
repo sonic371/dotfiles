@@ -25,13 +25,17 @@ ulimit -n 8192
 # SSH Agent Setup - Simple & Reliable
 # ====================================
 
-# Start SSH agent if not running
-if [ -z "$SSH_AUTH_SOCK" ]; then
-    eval "$(ssh-agent -s)" > /dev/null
-fi
+if command -v keychain >/dev/null 2>&1; then
+    # tell keychain which keys you want
+    
+    keychain --quiet ~/.ssh/id_ed25519
 
-# Add your SSH key
-ssh-add ~/.ssh/id_ed25519 2>/dev/null
+    # source keychain env vars so that new shells know about the agent
+    # keychain writes these into ~/.keychain/$HOST-sh
+    if [ -f "$HOME/.keychain/$HOST-sh" ]; then
+        source "$HOME/.keychain/$HOST-sh"
+    fi
+fi
 
 # ===== Reload function =====
 reload() {

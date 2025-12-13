@@ -21,21 +21,17 @@ bindkey '^I^I' autosuggest-accept  # Double-tap Tab to accept
 # ===== System settings =====
 ulimit -n 8192
 
-# Start agent if not running AND add your key
-if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-    # Start SSH agent
+# ===================================
+# SSH Agent Setup - Simple & Reliable
+# ====================================
+
+# Start SSH agent if not running
+if [ -z "$SSH_AUTH_SOCK" ]; then
     eval "$(ssh-agent -s)" > /dev/null
-    
-    # Add your SSH key (will prompt for passphrase)
-    ssh-add ~/.ssh/id_ed25519 2>/dev/null
-elif [ -z "$SSH_AUTH_SOCK" ]; then
-    # Agent is running but shell doesn't know about it
-    # Reconnect to existing agent
-    export SSH_AUTH_SOCK="$(find /tmp -type s -name 'agent.*' 2>/dev/null | head -1)"
-    
-    # Now add your key
-    ssh-add ~/.ssh/id_ed25519 2>/dev/null
 fi
+
+# Add your SSH key
+ssh-add ~/.ssh/id_ed25519 2>/dev/null
 
 # ===== Reload function =====
 reload() {

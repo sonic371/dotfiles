@@ -51,12 +51,14 @@ exec --no-startup-id xautolock -time 35 -locker 'systemctl suspend' -notify 30 -
 # =====================
 # Status Bar
 # =====================
-bar {
-    mode dock
-    hidden_state show
-    status_command i3status
-}
-set $refresh_i3status killall -SIGUSR1 i3status
+# bar {
+#     mode dock
+#     hidden_state show
+#     status_command i3status
+# }
+# set $refresh_i3status killall -SIGUSR1 i3status
+
+exec_always --no-startup-id polybar
 
 # =====================
 # Key Bindings
@@ -65,6 +67,7 @@ set $refresh_i3status killall -SIGUSR1 i3status
 # Application launchers
 bindsym $mod+Return exec kitty
 bindsym $mod+d exec "rofi -modi drun,run -show drun"
+bindsym $mod+Tab exec "rofi -show window"
 
 # Window management
 bindsym $mod+q kill
@@ -132,10 +135,10 @@ bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
 bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5%
 bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
-bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 # System controls
-bindsym $mod+b bar mode toggle
+bindsym $mod+b exec --no-startup-id polybar-msg cmd toggle
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes' 'i3-msg exit'"

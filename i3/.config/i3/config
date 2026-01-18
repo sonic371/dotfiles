@@ -48,17 +48,20 @@ exec --no-startup-id xset dpms 2100 2100 2100
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c 000000 &
 exec --no-startup-id xautolock -time 35 -locker 'systemctl suspend' -notify 30 -notifier 'notify-send "Suspending in 30 seconds"' &
 
+# Key chain
+exec --no-startup-id eval "$(ssh-agent -s)"[citation:8][citation:9]
+
 # =====================
 # Status Bar
 # =====================
-# bar {
-#     mode dock
-#     hidden_state show
-#     status_command i3status
-# }
+bar {
+    mode dock
+    hidden_state show
+    status_command i3blocks
+}
 # set $refresh_i3status killall -SIGUSR1 i3status
 
-exec_always --no-startup-id polybar
+# exec_always --no-startup-id polybar
 
 # =====================
 # Key Bindings
@@ -138,7 +141,7 @@ bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 # System controls
-bindsym $mod+b exec --no-startup-id polybar-msg cmd toggle
+# bindsym $mod+b exec --no-startup-id polybar-msg cmd toggle
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes' 'i3-msg exit'"
@@ -169,3 +172,8 @@ bindsym $mod+r mode "resize"
 # Window Rules
 # =====================
 for_window [title="scratchpad"] floating enable, move to scratchpad, resize set 1366 960
+
+# Pipewire-pulse
+bindsym XF86AudioMute --release exec pkill -RTMIN+1 i3blocks
+bindsym XF86AudioLowerVolume --release exec pkill -RTMIN+1 i3blocks
+bindsym XF86AudioRaiseVolume --release exec pkill -RTMIN+1 i3blocks

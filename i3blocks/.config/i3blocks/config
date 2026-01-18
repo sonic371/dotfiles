@@ -1,0 +1,107 @@
+# i3blocks config file
+
+command=/home/wade/.config/i3blocks/$BLOCK_NAME/$BLOCK_NAME
+separator_block_width=15
+markup=none
+
+# Generic media player support
+#
+[mediaplayer]
+instance=vlc,%any,spotify
+interval=5
+signal=10
+
+[memory2]
+interval=persist
+markup=pango
+bar_chars=_▏▎▍▌▋▊▉██
+bar_size=10
+warning=60
+critical=90
+color_warning=#FFA500
+color_critical=#FF7373
+
+
+# Disk usage
+#
+# The directory defaults to $HOME if the instance is not specified.
+# The script may be called with a optional argument to set the alert
+# (defaults to 10 for 10%).
+[disk]
+label=HOME
+#DIR=/mnt/data
+interval=30
+
+# Network interface monitoring
+#
+# If the instance is not specified, use the interface used for default route.
+# The address can be forced to IPv4 or IPv6 with -4 or -6 switches.
+[iface]
+#IFACE=wlan0
+color=#00FF00
+interval=10
+separator=false
+
+[wifi]
+label= 
+interval=10
+separator=false
+
+[bandwidth2]
+interval=persist
+markup=pango
+LABEL=
+INTERFACE=(checks all interfaces)
+USE_BITS=0
+USE_BYTES=1
+WARN_RX=0
+WARN_TX=0
+CRIT_RX=0
+CRIT_TX=0
+USE_SI=0
+
+# CPU usage
+#
+[cpu_usage2]
+markup=pango
+interval=persist
+min_width=CPU 100.00%
+REFRESH_TIME=1
+LABEL=CPU 
+WARN_PERCENT=50
+CRIT_PERCENT=80
+DECIMALS=2
+
+# Temperature
+#
+# Support multiple chips, though lm-sensors.
+# The script may be called with -w and -c switches to specify thresholds,
+# see the script for details.
+[temperature]
+label=TEMP
+interval=10
+
+# Battery indicator
+#
+[battery-time]
+interval=5
+
+[bluetooth]
+interval=5
+
+# Screnn brightness
+#
+[brightness]
+interval=5
+
+[volume-pipewire]
+interval=5
+signal=1
+AUDIO_DELTA=5
+
+
+# Date Time
+#
+[time]
+command=date '+%Y-%m-%d %H:%M:%S'
+interval=1

@@ -1,0 +1,33 @@
+#!/bin/bash
+# This script provides a bluetooth status icon and a click action to open bluetui.
+
+# --- Click Action ---
+# If a button is pressed, open bluetui in a terminal.
+# This runs in the background (&) so it doesn't block i3blocks.
+if [ -n "$BLOCK_BUTTON" ]; then
+    i3-sensible-terminal -e bluetui &
+fi
+
+# --- Status Display ---
+# Check if bluetooth is powered on using bluetoothctl.
+# The command returns a non-zero exit code if the controller is not available.
+if ! bluetoothctl show &> /dev/null; then
+    # Bluetooth controller not found or bluetoothd not running.
+    # Don't display the block.
+    exit
+fi
+
+
+if bluetoothctl show | grep -q "Powered: yes"; then
+    # Bluetooth is on. Check if any device is connected.
+    if bluetoothctl devices Connected | grep -q "Device"; then
+        # A device is connected. Show a "connected" icon and text.
+        echo "󰂱"
+    else
+        # No device connected, but bluetooth is on.
+        echo "󰂯"
+    fi
+else
+    # Bluetooth is off.
+    echo "󰂲 Off"
+fi

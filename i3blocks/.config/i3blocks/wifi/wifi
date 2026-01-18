@@ -1,0 +1,36 @@
+#!/bin/bash
+# A modern wifi script for i3blocks that uses nmcli.
+
+# --- Click Action ---
+# If a button is pressed, open nmtui in a terminal.
+# This runs in the background (&) so it doesn't block i3blocks.
+if [ -n "$BLOCK_BUTTON" ]; then
+    i3-sensible-terminal -e nmtui &
+    exit 0 # Exit immediately after handling the click.
+fi
+
+# Get the line for the active Wi-Fi connection.
+# The `*` marks the active connection.
+# We are looking for the 'IN-USE', 'SSID', and 'SIGNAL' fields.
+ACTIVE_WIFI_INFO=$(nmcli -t -f IN-USE,SSID,SIGNAL device wifi | grep '^*' | head -n1)
+
+if [ -n "$ACTIVE_WIFI_INFO" ]; then
+    # An active Wi-Fi connection was found.
+    # Parse the line to get SSID and SIGNAL.
+    # The output is colon-separated, e.g., "*:MyNetwork:88"
+    # We use cut to extract the second and third fields after splitting by ':'
+    SSID=$(echo "$ACTIVE_WIFI_INFO" | cut -d: -f2)
+    SIGNAL=$(echo "$ACTIVE_WIFI_INFO" | cut -d: -f3)
+
+    # Check if SSID or SIGNAL are empty, which can happen if parsing fails unexpectedly
+    if [ -n "$SSID" ] && [ -n "$SIGNAL" ]; then
+        # Print a more informative output: "NetworkName (Signal%)"
+        echo "$SSID ($SIGNAL%)"
+    else
+        # Fallback if parsing failed but connection was detected
+        echo "Connected"
+    fi
+else
+    # No active Wi-Fi connection.
+    echo "Disconnected"
+fi

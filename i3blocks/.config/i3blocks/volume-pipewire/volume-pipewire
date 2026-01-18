@@ -1,0 +1,78 @@
+#!/bin/bash
+# A new, simplified volume script for i3blocks, using pactl.
+
+# --- Configuration ---
+# The amount to change the volume by (can be overridden by AUDIO_DELTA in i3blocks.conf)
+DELTA=${AUDIO_DELTA:-5}
+
+# --- Helper Function to cycle sinks ---
+function set_default_playback_device_next {
+    inc=${1:-1}
+    sinks=($(pactl list sinks short | awk '{print $2}'))
+    num_sinks=${#sinks[@]}
+    default_sink=$(pactl get-default-sink)
+    
+    current_index=-1
+    for i in "${!sinks[@]}"; do
+       if [[ "${sinks[$i]}" = "$default_sink" ]]; then
+           current_index=$i
+           break
+       fi
+    done
+
+    if [[ "$current_index" != -1 ]]; then
+        new_index=$(( (current_index + inc + num_sinks) % num_sinks ))
+        new_sink=${sinks[$new_index]}
+        pactl set-default-sink "$new_sink"
+    fi
+}
+
+# --- Main Action Logic ---
+# First, check if a button was pressed and perform the corresponding action.
+# All output from these commands is hidden to prevent it from interfering with the block's text.
+if [ -n "$BLOCK_BUTTON" ]; then
+    case "$BLOCK_BUTTON" in
+        "1") # Left Click: Next Sink
+            set_default_playback_device_next 1
+            ;;
+        "2") # Middle Click: Mute
+            pactl set-sink-mute @DEFAULT_SINK@ toggle &> /dev/null
+            ;;
+        "3") # Right Click: Open wiremix
+            i3-sensible-terminal -e wiremix &
+            ;;
+        "4") # Scroll Up: Increase volume
+            pactl set-sink-volume @DEFAULT_SINK@ "+${DELTA}%" &> /dev/null
+            ;;
+        "5") # Scroll Down: Decrease volume
+            pactl set-sink-volume @DEFAULT_SINK@ "-${DELTA}%" &> /dev/null
+            ;;
+    esac
+fi
+
+# --- Main Display Logic ---
+# ALWAYS get the current status and print it. This prevents the block from ever being empty.
+
+# Get the mute status for the default sink
+IS_MUTED=$(pactl get-sink-mute @DEFAULT_SINK@ | awk '{print $2}')
+
+# If muted, display the muted status
+if [ "$IS_MUTED" = "yes" ]; then
+    echo " Muted"
+else
+    # If not muted, get the volume
+    volume=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5; exit}')
+    
+    # Determine the correct icon based on the volume level
+    vol_percent=$(echo "$volume" | sed 's/%//')
+    if [ "$vol_percent" -gt 66 ]; then
+        icon="" # High volume
+    elif [ "$vol_percent" -gt 33 ]; then
+        icon="" # Medium volume
+    else
+        icon="" # Low volume
+    fi
+
+    # Print the final output
+    echo "$icon $volume"
+fi

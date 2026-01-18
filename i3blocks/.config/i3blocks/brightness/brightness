@@ -1,0 +1,64 @@
+#!/bin/bash
+# A new, simplified brightness script for i3blocks
+
+# --- Configuration ---
+# Use the full path to the brightnessctl command
+BRIGHTNESSCTL="/usr/sbin/brightnessctl"
+# Auto-detect the brightness device
+DEVICE=$(brightnessctl --list | grep "Device '" | grep "' of class 'backlight'" | head -n1 | sed -n "s/Device '\([^']*\)'.*/\1/p")
+
+# If no backlight device is found, exit so the block doesn't appear.
+if [ -z "$DEVICE" ]; then
+    exit 0
+fi
+
+# --- Function to Get and Print Brightness ---
+# This function is the only thing that prints output.
+print_brightness_status() {
+    # Get the current brightness percentage
+    percent=$($BRIGHTNESSCTL -d "$DEVICE" info | grep -oP '\(\K[0-9]+(?=%)' || echo "0")
+
+    # Determine the icon based on the percentage
+    if [ "$percent" -lt 20 ]; then
+        icon="󰃞"
+    elif [ "$percent" -lt 40 ]; then
+        icon="󰃟"
+    elif [ "$percent" -lt 60 ]; then
+        icon="󰃝"
+    elif [ "$percent" -lt 80 ]; then
+        icon="󰃠"
+    else
+        icon="󰃡"
+    fi
+
+    # Print the final formatted output
+    echo "$icon $percent%"
+}
+
+# --- Main Logic ---
+
+# First, check if a button was pressed and perform an action.
+# The output of the set commands is hidden to prevent it from interfering.
+if [ -n "$BLOCK_BUTTON" ]; then
+    case "$BLOCK_BUTTON" in
+        "4") # Scroll Up
+            $BRIGHTNESSCTL -d "$DEVICE" set +10% &> /dev/null
+            ;;
+        "5") # Scroll Down
+            $BRIGHTNESSCTL -d "$DEVICE" set 10%- &> /dev/null
+            ;;
+        "1") # Left Click (Toggle)
+            current_percent=$($BRIGHTNESSCTL -d "$DEVICE" info | grep -oP '\(\K[0-9]+(?=%)' || echo "0")
+            if [ "$current_percent" -lt 50 ]; then
+                $BRIGHTNESSCTL -d "$DEVICE" set 100% &> /dev/null
+            else
+                $BRIGHTNESSCTL -d "$DEVICE" set 30% &> /dev/null
+            fi
+            ;;
+    esac
+fi
+
+# Finally, ALWAYS call the print function.
+# This ensures that whether the script was run by a click or a schedule,
+# it always provides a valid output, preventing the grey bar.
+print_brightness_status

@@ -1,0 +1,7 @@
+[rofi-wttr]
+interval=3600
+BAR_POSITION=center
+FONT=Monospace 10
+LABEL=🌡️
+LOCATION=fengyuan
+ROFI_CONFIG_FILE=/home/wade/.config/rofi/config.rasi

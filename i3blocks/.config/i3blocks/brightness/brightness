@@ -4,6 +4,9 @@
 # --- Configuration ---
 # Use the full path to the brightnessctl command
 BRIGHTNESSCTL="/usr/sbin/brightnessctl"
+# Redshift state files
+REDSHIFT_STATE_FILE="/tmp/i3blocks_redshift_state"
+REDSHIFT_PID_FILE="/tmp/i3blocks_redshift_pid"
 # Auto-detect the brightness device
 DEVICE=$(brightnessctl --list | grep "Device '" | grep "' of class 'backlight'" | head -n1 | sed -n "s/Device '\([^']*\)'.*/\1/p")
 
@@ -53,6 +56,25 @@ if [ -n "$BLOCK_BUTTON" ]; then
                 $BRIGHTNESSCTL -d "$DEVICE" set 100% &> /dev/null
             else
                 $BRIGHTNESSCTL -d "$DEVICE" set 30% &> /dev/null
+            fi
+            ;;
+        "2") # Middle Click (Toggle Dim Mode)
+            if command -v redshift &>/dev/null; then
+                if [ -f "$REDSHIFT_STATE_FILE" ] && [ "$(cat "$REDSHIFT_STATE_FILE")" = "on" ]; then
+                    # State is 'on', so turn it off
+                    redshift -x &> /dev/null
+                    echo "off" > "$REDSHIFT_STATE_FILE"
+                    # Kill background redshift if running and PID file exists
+                    if [ -f "$REDSHIFT_PID_FILE" ]; then
+                        kill "$(cat "$REDSHIFT_PID_FILE")" 2>/dev/null
+                        rm -f "$REDSHIFT_PID_FILE"
+                    fi
+                else
+                    # State is 'off' or file doesn't exist, so turn it on
+                    redshift -O 2500 &
+                    echo $! > "$REDSHIFT_PID_FILE"
+                    echo "on" > "$REDSHIFT_STATE_FILE"
+                fi
             fi
             ;;
     esac

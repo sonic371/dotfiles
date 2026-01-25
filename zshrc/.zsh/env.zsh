@@ -19,3 +19,6 @@ fi
 export FZF_DEFAULT_COMMAND="$FD_CMD --type f --hidden --follow --exclude .git --strip-cwd-prefix"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="$FD_CMD --type d --hidden --follow --exclude .git --strip-cwd-prefix"
+
+# Increase file descriptor limit
+ulimit -n 8192

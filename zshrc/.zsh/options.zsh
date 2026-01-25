@@ -28,6 +28,9 @@ setopt interactive_comments
 # Don't beep on error
 setopt no_beep
 
+# Enable auto cd (type directory name to cd)
+setopt auto_cd
+
 # Enable globbing patterns like **/*.txt
 setopt extended_glob
 

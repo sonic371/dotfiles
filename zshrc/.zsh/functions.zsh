@@ -29,3 +29,10 @@ c() {
 if (( ! $+commands[fd] && ! $+commands[fdfind] )); then
     echo "Warning: fd/fdfind not found. Install fd for better file searching."
 fi
+
+# ============================================================================
+# RELOAD FUNCTION
+# ============================================================================
+reload() {
+    source ~/.zshrc && echo "ZSH configuration reloaded"
+}

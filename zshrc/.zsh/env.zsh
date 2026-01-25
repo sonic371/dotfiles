@@ -5,7 +5,7 @@ export GTK_IM_MODULE=fcitx5
 export QT_IM_MODULE=fcitx5
 export XMODIFIERS=@im=fcitx5
 export PROTONPATH="/usr/share/steam/compatibilitytools.d/proton-ge-custom"
-export TERMINAL=alacritty
+export TERMINAL=kitty
 
 # fzf configuration with fd/fdfind
 if command -v fdfind >/dev/null 2>&1; then

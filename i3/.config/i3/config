@@ -30,8 +30,8 @@ exec --no-startup-id picom &
 
 # Display & Input
 exec --no-startup-id feh --bg-fill ~/Pictures/2.jpg
-exec --no-startup-id ~/.config/i3/Touchpad-setup.sh
-exec --no-startup-id ~/.config/i3/wacom-setup.sh
+exec --no-startup-id ~/Scripts/touchpad-setup.sh
+exec --no-startup-id ~/Scripts/xinput-wacom-pan.sh
 exec --no-startup-id setxkbmap -option altwin:swap_ralt_rwin
 
 # System utilities
@@ -148,10 +148,9 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes' 'i3-msg e
 bindsym $mod+Shift+p exec i3lock -c 000000 && systemctl suspend
 
 # Custom tools
-bindsym $mod+x exec ~/.config/i3/mousepos_notify.sh
-# bindsym $mod+c exec ~/.config/i3/set_share.sh
-bindsym $mod+Shift+q exec ~/.config/i3/wacom-setup.sh
-bindsym $mod+Shift+w exec ~/.config/i3/wacom-setup_2.sh
+bindsym $mod+x exec ~/Scripts/notify-fetch-mousepos.sh
+bindsym $mod+Shift+q exec ~/Scripts/xinput-wacom-pan.sh
+bindsym $mod+Shift+w exec ~/Scripts/xinput-wacom-middle-click.sh
 
 # =====================
 # Resize Mode

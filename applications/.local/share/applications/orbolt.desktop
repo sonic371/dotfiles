@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=orbolt
 GenericName=orbolt
-TryExec=/opt/hfs21.0.440/bin/orbolt_url
-Exec=/opt/hfs21.0.440/bin/orbolt_url %u
+TryExec=/opt/hfs21.0.596/bin/orbolt_url
+Exec=/opt/hfs21.0.596/bin/orbolt_url %u
 Terminal=false
 Type=Application
 StartupNotify=true

@@ -3,11 +3,30 @@
 # =====================
 set $mod Mod4
 font pango:monospace 10
-default_border none
+
 floating_modifier $mod
 tiling_drag modifier titlebar
 
-# Workspace names with icons
+######################################################
+# Plain Black & White Theme
+######################################################
+
+# Disable title bars for a clean, borderless look on tiled windows
+default_border pixel 0
+default_floating_border pixel 0
+
+# Color definitions: Border, Background, Text, Indicator, Child Border
+# Focused window: Bright white elements on pure black
+client.focused          #000000 #000000 #ffffff #ffffff   #000000
+# Unfocused window: Dark grey on black (almost invisible)
+client.unfocused        #1a1a1a #000000 #666666 #1a1a1a   #000000
+# Urgent window: Inverted black-on-white for stark contrast
+client.urgent           #000000 #ffffff #000000 #000000   #ffffff
+# Placeholder windows (empty workspaces): pure black
+client.placeholder      #000000 #000000 #000000 #000000   #000000
+
+
+# Workspace names
 set $ws1 "1"
 set $ws2 "2"
 set $ws3 "3"
@@ -26,16 +45,16 @@ set $ws10 "10"
 # Essential services
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id dunst
-exec --no-startup-id picom &
+exec --no-startup-id picom
 
 # Display & Input
-exec --no-startup-id ~/Scripts/wallpaper.sh &
+exec --no-startup-id ~/Scripts/wallpaper.sh
 exec --no-startup-id ~/Scripts/touchpad-setup.sh
 exec --no-startup-id ~/Scripts/xinput-wacom-pan.sh
 exec --no-startup-id setxkbmap -option altwin:swap_ralt_rwin
 
 # System utilities
-exec --no-startup-id unclutter -idle 3 &
+exec --no-startup-id unclutter -idle 3
 exec --no-startup-id auto-cpufreq --daemon
 
 # Applications
@@ -43,13 +62,11 @@ exec --no-startup-id fcitx5 -d
 exec --no-startup-id mega-sync
 
 # Lock & Suspend (consolidated)
+exec --no-startup-id xset -b
 exec --no-startup-id xset s 2100 2100
 exec --no-startup-id xset dpms 2100 2100 2100
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c 000000 &
-exec --no-startup-id xautolock -time 35 -locker 'systemctl suspend' -notify 30 -notifier 'notify-send "Suspending in 30 seconds"' &
-
-# Key chain
-exec --no-startup-id eval "$(ssh-agent -s)"[citation:8][citation:9]
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork -c 000000
+exec --no-startup-id xautolock -time 35 -locker 'systemctl suspend' -notify 30 -notifier 'notify-send "Suspending in 30 seconds"'
 
 # =====================
 # Status Bar
@@ -58,10 +75,15 @@ bar {
     mode hide
     hidden_state hide
     status_command i3blocks
+    colors {
+        # Focused workspace (the one you are on)
+        focused_workspace  #000000 #000000 #ffffff
+        # Inactive workspace (other workspaces)
+        inactive_workspace #000000 #000000 #888888
+        # Urgent workspace (demands attention)
+        urgent_workspace   #000000 #ffffff #000000
+    }
 }
-# set $refresh_i3status killall -SIGUSR1 i3status
-
-# exec_always --no-startup-id polybar
 
 # =====================
 # Key Bindings
@@ -136,17 +158,16 @@ bindsym --release Shift+Print exec maim -s ~/Pictures/screenshots/$(date +%Y-%m-
 # Media keys
 bindsym XF86MonBrightnessUp exec brightnessctl set +5%
 bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
-bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5%
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
+# Pipewire-pulse
+bindsym XF86AudioMute exec "pactl set-sink-mute 0 toggle; pkill -RTMIN+1 i3blocks"
+bindsym XF86AudioLowerVolume exec "pactl set-sink-volume 0 -5%; pkill -RTMIN+1 i3blocks"
+bindsym XF86AudioRaiseVolume exec "pactl set-sink-volume 0 +5%; pkill -RTMIN+1 i3blocks"
 bindsym XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 # System controls
-# bindsym $mod+b exec --no-startup-id polybar-msg cmd toggle
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3?' -B 'Yes' 'i3-msg exit'"
-bindsym $mod+Shift+p exec i3lock -c 000000 && systemctl suspend
 
 # Custom tools
 bindsym $mod+x exec ~/Scripts/notify-fetch-mousepos.sh
@@ -173,7 +194,7 @@ bindsym $mod+r mode "resize"
 # =====================
 for_window [title="scratchpad"] floating enable, move to scratchpad, resize set 1366 960
 
-# Pipewire-pulse
-bindsym XF86AudioMute --release exec pkill -RTMIN+1 i3blocks
-bindsym XF86AudioLowerVolume --release exec pkill -RTMIN+1 i3blocks
-bindsym XF86AudioRaiseVolume --release exec pkill -RTMIN+1 i3blocks
+
+
+
+

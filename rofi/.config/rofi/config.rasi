@@ -7,6 +7,6 @@
 
 //@theme "/usr/share/rofi/themes/dmenu.rasi"
 
-@theme "win98.rasi"
+@theme "xterm_bw.rasi"
 
 //@theme "/usr/share/rofi/themes/DarkBlue.rasi"

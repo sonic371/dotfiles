@@ -36,7 +36,7 @@
     alternate-active-background: @alternate-active-background;
 
     spacing:                     0;
-    font:                        "monospace 10"; // Classic monospace font
+    font:                        "monospace 12"; // Classic monospace font
 }
 
 window {
@@ -76,7 +76,7 @@ listview {
 
 element {
     border:  0;
-    padding: 2px 4px; /* Minimal padding */
+    padding: 4px 4px; /* Minimal padding, increased vertical */
 }
 
 element-text {
@@ -136,7 +136,7 @@ entry {
     spacing:    0;
     text-color: @foreground;
     border:     0;
-    padding:    2px 4px;
+    padding:    4px 4px;
     background-color: @background;
     cursor:     text;
     placeholder-color: #AAAAAA; /* Light gray placeholder */

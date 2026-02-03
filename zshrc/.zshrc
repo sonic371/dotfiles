@@ -15,6 +15,7 @@ zsh_config_files=(
   dotfiles.zsh
   ssh.zsh
   key-bindings.zsh
+  swap-ralt.zsh
 )
 
 # Source each configuration file if it exists.

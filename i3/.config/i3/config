@@ -10,7 +10,7 @@ tiling_drag modifier titlebar
 include ~/.config/i3/workspaces.conf
 include ~/.config/i3/rules.conf
 
-exec_always --no-startup-id ~/.config/i3/scripts/autostart.sh
+exec_always --no-startup-id ~/.config/scripts/autostart.sh
 
 # =====================
 # Status Bar

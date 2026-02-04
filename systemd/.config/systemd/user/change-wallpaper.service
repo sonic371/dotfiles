@@ -1,0 +1,6 @@
+[Unit]
+Description=Change Wallpaper
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/scripts/wallpaper.sh

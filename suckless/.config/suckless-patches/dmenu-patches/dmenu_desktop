@@ -1,0 +1,38 @@
+#!/bin/sh
+
+cachedir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
+cache_file="$cachedir/dmenu_desktop_cache"
+
+[ ! -e "$cachedir" ] && mkdir -p "$cachedir"
+
+# If no arguments are passed, it means we should list the applications
+if [ $# -eq 0 ]; then
+    # Always rebuild the cache if not doing a lookup
+    > "$cache_file" # Clear the cache file
+
+    # Use find -L to follow symlinks
+    find -L /usr/share/applications ~/.local/share/applications -name "*.desktop" 2>/dev/null | while IFS= read -r desktop_file; do
+        name=$(grep '^Name=' "$desktop_file" | head -n 1 | cut -d= -f2-)
+        # Do NOT strip quotes here. Pass the Exec command as is, including any quotes.
+        exec_cmd=$(grep '^Exec=' "$desktop_file" | head -n 1 | cut -d= -f2- | sed 's/ %./ /g')
+
+        if [ -n "$name" ] && [ -n "$exec_cmd" ]; then
+            # Store name and exec command as is.
+            echo "${name}|${exec_cmd}" >> "$cache_file"
+        fi
+    done
+
+    # Output unique names for dmenu display
+    if [ -s "$cache_file" ]; then
+        awk -F'|' '{print $1}' "$cache_file" | sort -u
+    fi
+else
+    # An argument was passed, it's the selected name, so lookup and output the Exec command
+    selected_name="$1"
+    if [ -n "$selected_name" ] && [ -s "$cache_file" ]; then
+        # Find the first matching Exec command for the selected name
+        # Return the Exec command as is, with original quotes if present.
+        exec_to_run=$(grep "^${selected_name}|" "$cache_file" | head -n 1 | cut -d'|' -f2-)
+        echo "$exec_to_run"
+    fi
+fi

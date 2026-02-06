@@ -1,0 +1,23 @@
+#!/bin/sh
+# Display currently playing music.
+
+case "$BLOCK_BUTTON" in
+    1) playerctl play-pause ;;
+    2) playerctl next && sleep 2 && kill -36 $(pidof dwmblocks) ;;
+    3) playerctl previous && sleep 2 && kill -36 $(pidof dwmblocks) ;;
+    4) playerctl position 10- ;;
+    5) playerctl position 10+ ;;
+    6) kitty -e "$EDITOR" "$0" ;;
+esac
+
+status="$(playerctl --no-messages status)" || exit 1
+case "$status" in
+    Stopped) exit ;;
+    Paused) icon="" ;;
+    Playing) icon="󰝚" ;;
+esac
+
+song="$(playerctl metadata --format="{{title}} - {{artist}}")" || exit 2
+
+. sb-theme
+display "$icon $song"

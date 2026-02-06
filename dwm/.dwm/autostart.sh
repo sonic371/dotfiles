@@ -2,8 +2,8 @@
 
 # --- Essential services ---
 # Restart sxhkd to avoid multiple instances on reload
-pkill -x sxhkd
-sxhkd -c ~/.config/i3/sxhkd/sxhkdrc &
+# pkill -x sxhkd
+# sxhkd -c ~/.config/i3/sxhkd/sxhkdrc &
 
 dunst &
 picom &

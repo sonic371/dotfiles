@@ -1,3 +1,6 @@
 [submodule "dwm/.local/src/dwm"]
 	path = dwm/.local/src/dwm
 	url = https://git.suckless.org/dwm
+[submodule "dmenu/.local/src/dmenu"]
+	path = dmenu/.local/src/dmenu
+	url = https://git.suckless.org/dmenu

@@ -4,3 +4,6 @@
 [submodule "dmenu/.local/src/dmenu"]
 	path = dmenu/.local/src/dmenu
 	url = https://git.suckless.org/dmenu
+[submodule "dwmblocks-async/.local/src/dwmblocks-async"]
+	path = dwmblocks-async/.local/src/dwmblocks-async
+	url = https://github.com/UtkarshVerma/dwmblocks-async.git

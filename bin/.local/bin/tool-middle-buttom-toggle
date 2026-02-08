@@ -1,0 +1,11 @@
+#!/bin/sh
+STATE_FILE="/tmp/trackpoint_scrolling_state"
+
+# Toggle between button 0 and 2 for middle button scrolling
+if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "on" ]; then
+    xinput set-prop "TPPS/2 Synaptics TrackPoint" "libinput Button Scrolling Button" 0
+    echo "off" > "$STATE_FILE"
+else
+    xinput set-prop "TPPS/2 Synaptics TrackPoint" "libinput Button Scrolling Button" 2
+    echo "on" > "$STATE_FILE"
+fi

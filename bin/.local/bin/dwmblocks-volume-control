@@ -1,0 +1,61 @@
+#!/bin/bash
+# Volume script using pactl with 150% limit
+
+# Handle clicks
+case "${BLOCK_BUTTON:-}" in
+    1) # Left click - open wiremix in floating mode
+        # Open wiremix in background
+        kitty --name "wiremix" -e wiremix &
+        ;;
+    2) # Middle click - toggle mute
+        pactl set-sink-mute @DEFAULT_SINK@ toggle 2>/dev/null
+        ;;
+    4) # Scroll up - increase volume (5%) with limit
+        # Get current volume first
+        current_vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -oP '\d+(?=%)' | head -1)
+        if [[ $current_vol -lt 150 ]]; then
+            pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null
+        fi
+        ;;
+    5) # Scroll down - decrease volume (5%)
+        pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null
+        ;;
+    6) # Other button - edit script
+        ${TERMINAL:-kitty} -e ${EDITOR:-vim} "$0"
+        ;;
+esac
+
+# Get mute status
+muted=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk '{print $2}')
+
+if [[ $muted == "yes" ]]; then
+    echo "MUTED"
+    exit 0
+fi
+
+# Get volume percentage
+volume_info=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null)
+
+# Extract the percentage
+if [[ $volume_info =~ ([0-9]+)% ]]; then
+    volume="${BASH_REMATCH[1]}"
+else
+    volume="?"
+fi
+
+# Ensure volume doesn't exceed 150% (in case it was already above)
+if [[ $volume =~ ^[0-9]+$ ]] && (( volume > 150 )); then
+    pactl set-sink-volume @DEFAULT_SINK@ 150% 2>/dev/null
+    volume=150
+fi
+
+# Select icon
+if (( volume > 50 )); then
+    icon=" "
+elif (( volume > 15 )); then
+    icon=" "
+else
+    icon=" "
+fi
+
+echo "$icon$volume%"

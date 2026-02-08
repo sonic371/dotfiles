@@ -1,0 +1,63 @@
+#!/bin/bash
+bat="/sys/class/power_supply/BAT0"
+[ ! -d "$bat" ] && exit 0
+
+read -r capacity < "$bat/capacity"
+read -r status < "$bat/status"
+read -r energy_now < "$bat/energy_now" 2>/dev/null
+read -r power_now < "$bat/power_now" 2>/dev/null
+
+# Calculate time based on status
+time_str=""
+if [[ -n $energy_now ]] && [[ -n $power_now ]] && (( power_now > 0 )); then
+    if [[ $status == "Discharging" ]]; then
+        # Time to empty: energy_now / power_now
+        seconds_left=$((energy_now * 3600 / power_now))
+    elif [[ $status == "Charging" ]]; then
+        # Time to full: need energy_full - energy_now
+        read -r energy_full < "$bat/energy_full" 2>/dev/null || \
+        read -r energy_full < "$bat/energy_full_design" 2>/dev/null
+        
+        if [[ -n $energy_full ]] && (( energy_full > energy_now )); then
+            energy_needed=$((energy_full - energy_now))
+            seconds_left=$((energy_needed * 3600 / power_now))
+        fi
+    fi
+    
+    # Format time if we have it
+    if [[ -n $seconds_left ]] && (( seconds_left > 0 )); then
+        hours=$((seconds_left / 3600))
+        minutes=$(( (seconds_left % 3600) / 60 ))
+        
+        if (( hours > 0 )); then
+            time_str=" (${hours}h${minutes}m)"
+        else
+            time_str=" (${minutes}m)"
+        fi
+    fi
+fi
+
+# Icon and status text
+if [[ $status == "Charging" ]]; then
+    icon="󱐋"
+    echo "$icon $capacity%${time_str}"
+elif [[ $status == "Discharging" ]]; then
+    if (( capacity < 20 )); then
+        icon="󰂎"
+    elif (( capacity < 40 )); then
+        icon="󱊡"
+    elif (( capacity < 60 )); then
+        icon="󱊢"
+    else
+        icon="󱊣"
+    fi
+    echo "$icon $capacity%${time_str}"
+elif [[ $status == "Full" ]] || (( capacity == 100 )); then
+    echo "󱊣 $capacity% (Full)"
+elif [[ $status == "Not charging" ]] || [[ $status == "Idle" ]]; then
+    # Reached charge threshold, connected to power but not charging
+    echo "󱊣 $capacity% (Idle)"
+else
+    # Unknown status
+    echo "󱊣 $capacity%"
+fi

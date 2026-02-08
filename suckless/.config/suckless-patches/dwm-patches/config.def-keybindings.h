@@ -3,7 +3,7 @@
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const int showbar            = 1;        /* 0 means no bar */
+static const int showbar            = 0;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
@@ -107,14 +107,19 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
-	/* Brightness control */
+	/* Media keys control */
 	{ 0,                            XF86XK_MonBrightnessUp,   spawn, SHCMD("brightnessctl set +5%") },
 	{ 0,                            XF86XK_MonBrightnessDown, spawn, SHCMD("brightnessctl set 5%-") },
-	/* Volume control */
 	{ 0,                            XF86XK_AudioMute,         spawn, SHCMD("pactl set-sink-mute 0 toggle") },
 	{ 0,                            XF86XK_AudioLowerVolume,  spawn, SHCMD("pactl set-sink-volume 0 -5%") },
 	{ 0,                            XF86XK_AudioRaiseVolume,  spawn, SHCMD("pactl set-sink-volume 0 +5%") },
 	{ 0,                            XF86XK_AudioMicMute,      spawn, SHCMD("pactl set-source-mute @DEFAULT_SOURCE@ toggle") },
+	{ 0,                            XF86XK_Display,           spawn, SHCMD("autorandr -c") },
+	{ 0,                            XF86XK_WLAN,              spawn, SHCMD("redshift") },
+	{ 0,                            XF86XK_Messenger,         spawn, SHCMD("redshift") },
+	{ 0,                            XF86_Go,                  spawn, SHCMD("playerctl previous") },
+	{ 0,                            XK_Cancel,                spawn, SHCMD("play-pause") },
+	{ 0,                            XF86_Favorites,           spawn, SHCMD("playerctl next") },
 };
 
 /* button definitions */

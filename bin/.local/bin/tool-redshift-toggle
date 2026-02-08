@@ -1,0 +1,21 @@
+#!/bin/sh
+REDSHIFT_STATE_FILE="/tmp/i3blocks_redshift_state"
+REDSHIFT_PID_FILE="/tmp/i3blocks_redshift_pid"
+
+if ! command -v redshift >/dev/null 2>&1; then
+	echo "Redshift: NOT INSTALLED"
+	exit 1
+fi
+
+if [ -f "$REDSHIFT_STATE_FILE" ] && [ "$(cat "$REDSHIFT_STATE_FILE")" = "on" ]; then
+	redshift -x >/dev/null 2>&1
+	echo "off" > "$REDSHIFT_STATE_FILE"
+	if [ -f "$REDSHIFT_PID_FILE" ]; then
+		kill "$(cat "$REDSHIFT_PID_FILE")" 2>/dev/null
+		rm -f "$REDSHIFT_PID_FILE"
+	fi
+else
+	redshift -O 2500 &
+	echo $! > "$REDSHIFT_PID_FILE"
+	echo "on" > "$REDSHIFT_STATE_FILE"
+fi

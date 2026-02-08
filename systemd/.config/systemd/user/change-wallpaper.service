@@ -3,4 +3,6 @@ Description=Change Wallpaper
 
 [Service]
 Type=oneshot
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=%h/.Xauthority"
 ExecStart=%h/.config/scripts/wallpaper.sh

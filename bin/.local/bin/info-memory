@@ -1,0 +1,13 @@
+#!/bin/bash
+while IFS= read -r line; do
+    if [[ $line == MemTotal:* ]]; then
+        t=${line#MemTotal:}
+        t=${t%%kB*}
+        t=${t//[[:space:]]/}
+    elif [[ $line == MemAvailable:* ]]; then
+        a=${line#MemAvailable:}
+        a=${a%%kB*}
+        a=${a//[[:space:]]/}
+    fi
+done < /proc/meminfo
+echo "$((100*(t-a)/t))%"

@@ -6,6 +6,7 @@ export QT_IM_MODULE=fcitx5
 export XMODIFIERS=@im=fcitx5
 export PROTONPATH="/usr/share/steam/compatibilitytools.d/proton-ge-custom"
 export TERMINAL=kitty
+export PATH="$HOME/.local/bin:$PATH"
 
 # fzf configuration with fd/fdfind
 if command -v fdfind >/dev/null 2>&1; then

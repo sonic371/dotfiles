@@ -1,0 +1,18 @@
+#!/bin/bash
+percent=$(brightnessctl -m | cut -d, -f4 | tr -d '%' 2>/dev/null)
+
+case "${BLOCK_BUTTON:-}" in
+    1) (( percent < 50 )) && brightnessctl s 100% >/dev/null || brightnessctl s 30% >/dev/null ;;
+    2) /home/wade/.local/bin/tool-redshift-toggle >/dev/null ;;
+    4) brightnessctl s +10% >/dev/null ;;
+    5) brightnessctl s 10%- >/dev/null ;;
+esac
+
+percent=$(brightnessctl -m | cut -d, -f4 | tr -d '%' 2>/dev/null)
+
+# 4 icons with 25% increments
+icons=("󰃞" "󰃟" "󰃝" "󰃠")
+index=$((percent / 25))
+(( index > 3 )) && index=3
+
+echo "${icons[index]} $percent%"

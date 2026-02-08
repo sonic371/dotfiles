@@ -3,5 +3,5 @@
 # Supports MPRIS-compatible music players.
 
 playerctl metadata --follow --format "{{title}}{{artist}}{{status}}" | while read -r _; do
-    pkill -RTMIN+2 "$STATUSBAR"
+    kill -36 $(pidof dwmblocks) 2>/dev/null
 done

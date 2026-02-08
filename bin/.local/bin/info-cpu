@@ -1,0 +1,10 @@
+#!/bin/bash
+read -r cpu u n s i iw ir si st _ < /proc/stat
+sleep 1
+read -r cpu u2 n2 s2 i2 iw2 ir2 si2 st2 _ < /proc/stat
+
+idle_diff=$((i2 - i))
+work_diff=$(( (u2-u)+(n2-n)+(s2-s)+(iw2-iw)+(ir2-ir)+(si2-si)+(st2-st) ))
+total_diff=$((work_diff + idle_diff))
+
+(( total_diff > 0 )) && echo "$((100 * work_diff / total_diff))%" || echo "0%"

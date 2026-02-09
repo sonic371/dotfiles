@@ -1,0 +1,12 @@
+--- config.def.h	2026-02-09 13:00:34.146700939 +0800
++++ config.def_add-floating-rules.h	2026-02-09 13:02:36.878877615 +0800
+@@ -29,6 +29,9 @@
+ 	/* class      instance    title       tags mask     isfloating   monitor    float x,y,w,h         floatborderpx*/
+ 	{ "Gimp",     NULL,       NULL,       0,            1,           -1,        50,50,500,500,        5 },
+ 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1,        50,50,500,500,        5 },
++	{ "kitty",    "wiremix",  NULL,       0,            1,           -1,        1000,30,910,800,      2 },
++	{ "kitty",    "bluetui",  NULL,       0,            1,           -1,        1000,30,910,800,      2 },
++	{ "kitty",    "nmtui",    NULL,       0,            1,           -1,        1000,30,910,800,      2 },
+ };
+ 
+ /* layout(s) */

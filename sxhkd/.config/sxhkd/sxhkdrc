@@ -1,2 +1,42 @@
+XF86AudioMute
+	pactl set-sink-mute @DEFAULT_SINK@ toggle 2>/dev/null && kill -42 $(pidof dwmblocks)
+
+XF86AudioLowerVolume
+	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+
+XF86AudioRaiseVolume
+	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+
+XF86AudioMicMute
+	pactl set-source-mute @DEFAULT_SOURCE@ toggle && kill -40 $(pidof dwmblocks)
+
+XF86MonBrightnessDown
+	brightnessctl s 10%- >/dev/null && kill -35 $(pidof dwmblocks)
+
+XF86MonBrightnessUp
+	brightnessctl s +10% >/dev/null && kill -35 $(pidof dwmblocks)
+
+XF86Display
+	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+
+XF86Messenger
+	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+
+XF86Go
+	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+
+Cancel
+	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+
 XF86Favorites
 	/home/wade/.local/bin/tool-middle-buttom-toggle
+
+@Print
+	maim -s | xclip -selection clipboard -t image/png
+
+# Screenshot region to file
+@shift + Print
+	maim -s ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png
+
+super + space
+	dmenu_run -fn 'Bm437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30

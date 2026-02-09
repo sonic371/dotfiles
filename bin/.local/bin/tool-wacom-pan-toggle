@@ -1,0 +1,12 @@
+#!/bin/sh
+STATE_FILE="/tmp/wacom_pan_state"
+
+# Toggle between pan and button +2 for Wacom stylus button 2
+if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "pan" ]; then
+    xsetwacom --set "Wacom Intuos BT S Pen stylus" Button 2 "button +2"
+    echo "button" > "$STATE_FILE"
+else
+    xsetwacom --set "Wacom Intuos BT S Pen stylus" Button 2 "pan"
+    xsetwacom --set "Wacom Intuos BT S Pen stylus" "PanScrollThreshold" 200
+    echo "pan" > "$STATE_FILE"
+fi

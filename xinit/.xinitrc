@@ -2,33 +2,33 @@
 # ~/.xinitrc - Complete but minimal startup
 
 # === KILL EXISTING INSTANCES ===
-pkill dunst 2>/dev/null
-pkill picom 2>/dev/null
-pkill dwmblocks 2>/dev/null
-pkill dwmblocks-musicup 2>/dev/null
-pkill unclutter 2>/dev/null
-pkill fcitx5 2>/dev/null
-pkill mega-sync 2>/dev/null
-pkill xidlehook 2>/dev/null
+pkill dunst
+pkill picom
+pkill dwmblocks
+pkill dwmblocks-musicup
+pkill unclutter
+pkill fcitx5
+pkill mega-sync
+pkill xidlehook
+pkill sxhkd
 
 # === ESSENTIAL SERVICES (sequential) ===
 dunst &
-sleep 0.3
 picom &
+sxhkd &
 dwmblocks &
 dwmblocks-musicup &
 
 # === DISPLAY & INPUT (blocking) ===
 ~/.config/scripts/wallpaper.sh
-~/.config/scripts/touchpad-setup.sh
-~/.config/scripts/xinput-wacom-pan.sh
+~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1
 
 # === SYSTEM UTILITIES (background) ===
 unclutter -idle 3 &
 
 # === APPLICATIONS (background) ===
-fcitx5 -d &
-mega-sync &
+fcitx5 -d >/dev/null 2>&1 &
+mega-sync >/dev/null 2>&1
 
 # === POWER MANAGEMENT ===
 # Disable screensaver and DPMS
@@ -39,7 +39,8 @@ xidlehook \
   --not-when-audio \
   --timer 60 'xset dpms force off' '' \
   --timer 2070 'notify-send "Suspending in 30 seconds"' '' \
-  --timer 2100 'i3lock --nofork -c 000000 && systemctl suspend' '' &
+  --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
+  &
 
 # === FINAL: START DWM ===
 exec dwm

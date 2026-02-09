@@ -1,0 +1,36 @@
+#!/bin/bash
+interface="wlp1s0"  # or your interface
+
+rx_file="/sys/class/net/$interface/statistics/rx_bytes"
+tx_file="/sys/class/net/$interface/statistics/tx_bytes"
+
+# First read
+rx1=$(<"$rx_file")
+tx1=$(<"$tx_file")
+sleep 1  # Wait 1 second
+# Second read
+rx2=$(<"$rx_file")
+tx2=$(<"$tx_file")
+
+# Calculate speeds in bytes/sec
+rx_speed=$((rx2 - rx1))
+tx_speed=$((tx2 - tx1))
+
+# Convert to human readable
+if (( rx_speed < 1024 )); then
+    rx_display="${rx_speed} B/s"
+elif (( rx_speed < 1048576 )); then  # 1024*1024
+    rx_display="$((rx_speed / 1024)) KiB/s"
+else
+    rx_display="$((rx_speed / 1048576)) MiB/s"
+fi
+
+if (( tx_speed < 1024 )); then
+    tx_display="${tx_speed} B/s"
+elif (( tx_speed < 1048576 )); then
+    tx_display="$((tx_speed / 1024)) KiB/s"
+else
+    tx_display="$((tx_speed / 1048576)) MiB/s"
+fi
+
+echo "↓$rx_display ↑$tx_display"

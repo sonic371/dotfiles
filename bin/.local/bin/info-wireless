@@ -1,0 +1,8 @@
+#!/bin/bash
+
+case "${BLOCK_BUTTON:-}" in
+    1) kitty --name "nmtui" -e nmtui & ;;
+esac
+
+sig=$(awk '/wlp1s0:/ {gsub(/\.$/,"",$4); print $4}' /proc/net/wireless 2>/dev/null)
+[[ -n $sig ]] && echo "󰖩 (${sig}dBm)" || echo "󰤭"

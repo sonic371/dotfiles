@@ -1,0 +1,52 @@
+#!/bin/bash
+# create-vm.sh - Create VM from VDI template with conflict handling
+
+set -e
+
+VM_NAME="$1"
+TEMPLATE="$2"
+VM_DIR="${HOME}/VirtualBox VMs"
+VM_PATH="$VM_DIR/$VM_NAME"
+
+# Validate inputs
+[[ -z "$VM_NAME" || -z "$TEMPLATE" ]] && {
+    echo "Usage: $0 <vm-name> <template.vdi>" >&2
+    exit 1
+}
+
+[[ ! -f "$TEMPLATE" ]] && {
+    echo "Error: Template not found: $TEMPLATE" >&2
+    exit 1
+}
+
+# Clean up any existing VM with same name
+if VBoxManage showvminfo "$VM_NAME" &>/dev/null; then
+    echo "VM '$VM_NAME' exists, unregistering..." >&2
+    VBoxManage unregistervm "$VM_NAME" --delete 2>/dev/null || true
+fi
+
+# Remove any leftover directory
+if [[ -d "$VM_PATH" ]]; then
+    echo "Cleaning up existing directory: $VM_PATH" >&2
+    rm -rf "$VM_PATH"
+fi
+
+# Create VM directory
+mkdir -p "$VM_PATH"
+NEW_VDI="$VM_PATH/$VM_NAME.vdi"
+
+echo "Creating VM '$VM_NAME'..."
+echo "Template: $TEMPLATE"
+echo "Location: $VM_PATH"
+
+# Clone template
+VBoxManage clonemedium disk "$TEMPLATE" "$NEW_VDI" --format VDI
+
+# Create VM
+VBoxManage createvm --name "$VM_NAME" --ostype "Other_Linux64" --basefolder "$VM_DIR" --register
+VBoxManage storagectl "$VM_NAME" --name "SATA" --add sata --bootable on
+VBoxManage storageattach "$VM_NAME" --storagectl "SATA" --port 0 --device 0 --type hdd --medium "$NEW_VDI"
+VBoxManage modifyvm "$VM_NAME" --memory 4096 --cpus 2 --nic1 nat
+
+echo "VM created successfully: $VM_PATH"
+echo "Start: VBoxManage startvm '$VM_NAME'"

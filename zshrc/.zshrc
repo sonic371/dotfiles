@@ -8,13 +8,14 @@
 # A list of configuration files to source, in order.
 zsh_config_files=(
   env.zsh
-  plugins.zsh
+  oh-my-zsh.zsh
+  fzf-integration.zsh
+  zoxide-integration.zsh
   aliases.zsh
   functions.zsh
   options.zsh
   dotfiles.zsh
   ssh.zsh
-  key-bindings.zsh
   swap-ralt.zsh
 )
 

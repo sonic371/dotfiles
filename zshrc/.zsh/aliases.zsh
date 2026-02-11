@@ -6,8 +6,6 @@ alias lt='eza --all --long  --tree --level 3 --group-directories-first'
 alias lts='eza --all --long  --tree --level 3 --group-directories-first --total-size'
 
 # Utilities aliases
-alias grep='rg'
-alias yz='yazi'
 
 # Git Shortcuts
 alias g='git'

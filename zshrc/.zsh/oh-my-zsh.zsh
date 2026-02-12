@@ -5,9 +5,6 @@
 
 export ZSH="$HOME/.oh-my-zsh"
 
-# Theme configuration
-ZSH_THEME="random"  # nice themes: af-magic, jonathan, rkj
-
 # Plugin selection - each plugin has a specific purpose
 plugins=(
   git                    # Git integration and aliases

@@ -40,3 +40,13 @@ XF86Favorites
 
 super + space
 	dmenu_run -fn 'Bm437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
+
+XF86AudioPrev
+	xdotool click --repeat 5 4
+
+XF86AudioNext
+	xdotool click --repeat 5 5
+
+# XF86WWW; @XF86WWW
+#	~/.local/bin/pan-scroll.sh
+

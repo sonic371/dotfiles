@@ -4,7 +4,7 @@
 # Single responsibility: Set global environment variables
 
 # Editor and terminal
-export EDITOR="/usr/bin/micro"
+export EDITOR="/usr/bin/nvim"
 export TERMINAL=kitty
 
 # Application-specific paths

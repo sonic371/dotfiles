@@ -1,26 +1,20 @@
 # ============================================================================
 # FZF INTEGRATION
 # ============================================================================
-# Single responsibility: Configure and load fzf (fuzzy finder) integration
+if command -v fzf &>/dev/null; then
+  export FZF_DEFAULT_COMMAND='fd --type f'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND='fd --type d'
 
-# Detect fd/fdfind for fzf commands
-if command -v fdfind >/dev/null 2>&1; then
-    FD_CMD="fdfind"
-elif command -v fd >/dev/null 2>&1; then
-    FD_CMD="fd"
-else
-    FD_CMD="find"
-fi
+  export FZF_DEFAULT_OPTS='
+    --height=40%
+    --layout=reverse
+    --border
+    --info=inline
+    --preview="bat --style=numbers --color=always {} 2>/dev/null | head -200"
+  '
 
-export FZF_DEFAULT_COMMAND="$FD_CMD --type f --hidden --follow --exclude .git --strip-cwd-prefix"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="$FD_CMD --type d --hidden --follow --exclude .git --strip-cwd-prefix"
-
-# Use system-provided fzf files if available
-if [ -f ~/.zsh/fzf/completion.zsh ]; then
-  source ~/.zsh/fzf/completion.zsh
-fi
-
-if [ -f ~/.zsh/fzf/key-bindings.zsh ]; then
-  source ~/.zsh/fzf/key-bindings.zsh
+  # Source fzf key bindings and completion if available
+  [[ -f /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
+  [[ -f /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
 fi

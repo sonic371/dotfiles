@@ -1,3 +1,5 @@
+ZSH_THEME="simple" # set by `omz`
+
 #!/usr/bin/env zsh
 # Main ZSH configuration file
 # Sources all modular configuration files from ~/.zsh/

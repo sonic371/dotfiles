@@ -11,6 +11,9 @@ vim.opt.rtp:prepend(lazypath)
 -- Load basic options
 require("options")
 
+-- Load key mappings
+require("keymaps").setup()
+
 -- Initialize lazy.nvim with import pattern
 -- Automatically merges all plugin specs from lua/plugins/*.lua
 require("lazy").setup({

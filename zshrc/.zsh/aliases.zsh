@@ -6,3 +6,6 @@ alias lts='eza --all --long  --tree --level 3 --group-directories-first --total-
 # Dotfiles navigation
 alias dot='cd ~/dotfiles'
 alias dots='cd ~/dotfiles && git status'
+
+# Neovim
+alias v='nvim'

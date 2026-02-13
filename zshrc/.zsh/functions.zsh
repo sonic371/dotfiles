@@ -25,21 +25,6 @@ c() {
     micro "$@"
 }
 
-# Neovim editor shortcut
-v() {
-    if [ $# -eq 0 ]; then
-        echo "Usage: v <file> (opens file in neovim)"
-        return 1
-    fi
-    nvim "$@"
-}
-
-
-# fd/fdfind wrapper
-if (( ! $+commands[fd] && ! $+commands[fdfind] )); then
-    echo "Warning: fd/fdfind not found. Install fd for better file searching."
-fi
-
 # ============================================================================
 # RELOAD FUNCTION
 # ============================================================================

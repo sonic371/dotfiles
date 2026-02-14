@@ -1,12 +1,32 @@
 #!/bin/sh
 STATE_FILE="/tmp/wacom_pan_state"
+DEVICE="Wacom Intuos BT S Pen stylus"
 
-# Toggle between pan and button +2 for Wacom stylus button 2
-if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "pan" ]; then
-    xsetwacom --set "Wacom Intuos BT S Pen stylus" Button 2 "button +2"
-    echo "button" > "$STATE_FILE"
-else
-    xsetwacom --set "Wacom Intuos BT S Pen stylus" Button 2 "pan"
-    xsetwacom --set "Wacom Intuos BT S Pen stylus" "PanScrollThreshold" 200
-    echo "pan" > "$STATE_FILE"
+# Check if the device exists
+if ! xsetwacom --list devices | grep -q "$DEVICE"; then
+    echo "Error: Wacom device not found"
+    exit 1
 fi
+
+# Read current state (default to empty if file doesn't exist)
+if [ -f "$STATE_FILE" ]; then
+    CURRENT_STATE=$(cat "$STATE_FILE")
+else
+    CURRENT_STATE=""
+fi
+
+# Toggle between pan and button +2
+if [ "$CURRENT_STATE" = "pan" ]; then
+    echo "Switching to button mode..."
+    xsetwacom --set "$DEVICE" Button 2 "button +2"
+    NEW_STATE="button"
+else
+    echo "Switching to pan mode..."
+    xsetwacom --set "$DEVICE" Button 2 "pan"
+    xsetwacom --set "$DEVICE" "PanScrollThreshold" 200
+    NEW_STATE="pan"
+fi
+
+# Save the new state
+echo "$NEW_STATE" > "$STATE_FILE"
+echo "Current state: $NEW_STATE"

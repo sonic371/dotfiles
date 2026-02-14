@@ -32,7 +32,9 @@ mega-sync >/dev/null 2>&1
 
 # === POWER MANAGEMENT ===
 # Disable screensaver and DPMS
-xset s off -dpms -b
+xset s off
+xset -dpms
+xset -b
 
 # Auto-suspend with xidlehook
 xidlehook \
@@ -41,6 +43,9 @@ xidlehook \
   --timer 2070 'notify-send "Suspending in 30 seconds"' '' \
   --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
   &
+
+#Load st color 
+xrdb -merge ~/.Xresources
 
 # === FINAL: START DWM ===
 exec dwm

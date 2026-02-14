@@ -5,7 +5,7 @@
 
 # Editor and terminal
 export EDITOR="/usr/bin/nvim"
-export TERMINAL=kitty
+export TERMINAL=st
 
 # Application-specific paths
 export _ZO_DATA_DIR="$HOME/.local/share/zoxide"

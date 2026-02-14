@@ -1,6 +1,9 @@
 #!/bin/sh
 # Display the current time in HH:MM:SS.
 
+# Set default terminal if not defined
+TERMINAL="${TERMINAL:-st}"
+
 notify() {
     notify-send --icon=office-calendar-symbolic \
         --hint=string:x-canonical-private-synchronous:"$1" "$@"
@@ -15,8 +18,36 @@ case $BLOCK_BUTTON in
             --format-event "• <span foreground='$(xrdb -get color6)'>%m</span>\n")"
         [ -n "$appointments" ] && notify "Appointments" "$appointments"
         ;;
-    2) setsid --fork terminal -e calcurse ;;
-    6) terminal -e "$EDITOR" "$0" ;;
+    2) 
+        # Define terminal-specific options for window name
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "calcurse")
+                ;;
+            st)
+                opts=(-n "calcurse")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e calcurse
+        ;;
+    6) 
+        # Define terminal-specific options for window name (editor)
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "editor")
+                ;;
+            st)
+                opts=(-n "editor")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e "$EDITOR" "$0"
+        ;;
 esac
 
 . sb-theme

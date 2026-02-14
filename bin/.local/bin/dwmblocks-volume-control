@@ -1,38 +1,57 @@
-#!/bin/bash
-# Volume script using pactl with 150% limit
+#!/bin/sh
+# Display the current time in HH:MM:SS.
 
-# Handle clicks
-case "${BLOCK_BUTTON:-}" in
-    1) # Left click - open wiremix in floating mode
-        # Open wiremix in background
-        kitty --name "wiremix" -e wiremix &
+# Set default terminal if not defined
+TERMINAL="${TERMINAL:-st}"
+
+notify() {
+    notify-send --icon=office-calendar-symbolic \
+        --hint=string:x-canonical-private-synchronous:"$1" "$@"
+}
+
+case $BLOCK_BUTTON in
+    1)
+        notify "This Month" "$(cal --color=always |
+            sed "s|..7m|<span color='$(xrdb -get color1)'>|;s|..0m|</span>|")"
+        appointments="$(calcurse -d1 \
+            --format-apt "• <i>%S - %E</i>\n  <span foreground='$(xrdb -get color6)'>%m</span>\n" \
+            --format-event "• <span foreground='$(xrdb -get color6)'>%m</span>\n")"
+        [ -n "$appointments" ] && notify "Appointments" "$appointments"
         ;;
-    2) # Middle click - toggle mute
-        pactl set-sink-mute @DEFAULT_SINK@ toggle 2>/dev/null
+    2) 
+        # Define terminal-specific options for window name
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "calcurse")
+                ;;
+            st)
+                opts=(-n "calcurse")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e calcurse
         ;;
-    4) # Scroll up - increase volume (5%) with limit
-        # Get current volume first
-        current_vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -oP '\d+(?=%)' | head -1)
-        if [[ $current_vol -lt 150 ]]; then
-            pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null
-        fi
-        ;;
-    5) # Scroll down - decrease volume (5%)
-        pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null
-        ;;
-    6) # Other button - edit script
-        ${TERMINAL:-kitty} -e ${EDITOR:-vim} "$0"
+    6) 
+        # Define terminal-specific options for window name (editor)
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "editor")
+                ;;
+            st)
+                opts=(-n "editor")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e "$EDITOR" "$0"
         ;;
 esac
 
-# Get mute status
-muted=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk '{print $2}')
-
-if [[ $muted == "yes" ]]; then
-    echo "MUTED"
-    exit 0
-fi
-
+. sb-theme
+display "󰥔 $(date '+%H:%M:%S')"
 # Get volume percentage
 volume_info=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null)
 

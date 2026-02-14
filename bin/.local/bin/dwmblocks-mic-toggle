@@ -3,7 +3,6 @@
 
 case "$BLOCK_BUTTON" in
     1) pactl set-source-mute @DEFAULT_SOURCE@ toggle ;;
-    6) kitty -e "$EDITOR" "$0" ;;
 esac
 
 . sb-theme

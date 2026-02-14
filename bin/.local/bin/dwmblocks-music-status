@@ -7,7 +7,6 @@ case "$BLOCK_BUTTON" in
     3) playerctl previous ;;
     4) playerctl position 10- ;;
     5) playerctl position 10+ ;;
-    6) kitty -e "$EDITOR" "$0" ;;
 esac
 
 status="$(playerctl --no-messages status)" || exit 1

@@ -1,7 +1,24 @@
 #!/bin/bash
 
+# Set default terminal if not defined
+TERMINAL="${TERMINAL:-st}"
+
 case "${BLOCK_BUTTON:-}" in
-    1) kitty --name "nmtui" -e nmtui & ;;
+    1) 
+        # Define terminal-specific options for window name
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "nmtui")
+                ;;
+            st)
+                opts=(-n "nmtui")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e nmtui &
+        ;;
 esac
 
 sig=$(awk '/wlp1s0:/ {gsub(/\.$/,"",$4); print $4}' /proc/net/wireless 2>/dev/null)

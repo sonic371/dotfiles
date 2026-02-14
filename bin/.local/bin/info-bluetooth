@@ -1,8 +1,25 @@
 #!/bin/bash
 # Get connected Bluetooth device name
-case "$BLOCK_BUTTON" in
-    1) kitty --name "bluetui" -e bluetui & ;;
 
+# Set default terminal if not defined
+TERMINAL="${TERMINAL:-st}"
+
+case "$BLOCK_BUTTON" in
+    1) 
+        # Define terminal-specific options for window name
+        case "$TERMINAL" in
+            kitty)
+                opts=(--name "bluetui")
+                ;;
+            st)
+                opts=(-n "bluetui")
+                ;;
+            *)
+                opts=()
+                ;;
+        esac
+        $TERMINAL "${opts[@]}" -e bluetui &
+        ;;
 esac
 
 if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then

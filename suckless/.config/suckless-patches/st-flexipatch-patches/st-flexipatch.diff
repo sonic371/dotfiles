@@ -1,0 +1,72 @@
+--- patches.h	2026-02-14 10:03:47.911003989 +0800
++++ patches_1.h	2026-02-14 19:34:23.766352098 +0800
+@@ -14,7 +14,7 @@
+  * when including this patch.
+  * https://st.suckless.org/patches/alpha/
+  */
+-#define ALPHA_PATCH 1
++#define ALPHA_PATCH 0
+ 
+ /* The alpha focus highlight patch allows the user to specify two distinct opacity values or
+  * background colors in order to easily differentiate between focused and unfocused terminal
+@@ -39,7 +39,7 @@
+ /* This patch allows st to resize to any pixel size rather than snapping to character width/height.
+  * https://st.suckless.org/patches/anysize/
+  */
+-#define ANYSIZE_PATCH 1
++#define ANYSIZE_PATCH 0
+ 
+ /* A simple variant of the anysize patch that only changes the resize hints to allow the window to
+  * be resized to any size.
+@@ -75,7 +75,7 @@
+ /* This patch adds custom rendering of lines/blocks/braille characters for gapless alignment.
+  * https://st.suckless.org/patches/boxdraw/
+  */
+-#define BOXDRAW_PATCH 1
++#define BOXDRAW_PATCH 0
+ 
+ /* By default st only sets PRIMARY on selection.
+  * This patch makes st set CLIPBOARD on selection.
+@@ -89,7 +89,7 @@
+  *
+  * https://github.com/bakkeby/st-flexipatch/issues/34
+  */
+-#define COLUMNS_PATCH 1
++#define COLUMNS_PATCH 0
+ 
+ /* Select and copy the last URL displayed with Mod+l. Multiple invocations cycle through the
+  * available URLs.
+@@ -359,7 +359,7 @@
+ /* Scroll back through terminal output using Shift+{PageUp, PageDown}.
+  * https://st.suckless.org/patches/scrollback/
+  */
+-#define SCROLLBACK_PATCH 1
++#define SCROLLBACK_PATCH 0
+ 
+ /* Scroll back through terminal output using Shift+MouseWheel.
+  * This variant depends on SCROLLBACK_PATCH being enabled.
+@@ -405,7 +405,7 @@
+  *
+  * https://gist.github.com/saitoha/70e0fdf22e3e8f63ce937c7f7da71809
+  */
+-#define SIXEL_PATCH 1
++#define SIXEL_PATCH 0
+ 
+ /* This patch allows clients to embed into the st window and is useful if you tend to
+  * start X applications from the terminal. For example:
+@@ -528,13 +528,13 @@
+  * apply the resources named in the resources[] array in config.h.
+  * https://st.suckless.org/patches/xresources/
+  */
+-#define XRESOURCES_PATCH 1
++#define XRESOURCES_PATCH 0
+ 
+ /* This patch adds the ability to reload the Xresources config when a SIGUSR1 signal is received
+  * e.g.: killall -USR1 st
+  * Depends on the XRESOURCES_PATCH.
+  */
+-#define XRESOURCES_RELOAD_PATCH 1
++#define XRESOURCES_RELOAD_PATCH 0
+ 
+ /* This patch adds the ability to configure st via Xdefaults, in addition to Xresources,
+  * like the rxvt-unicode terminal. At startup, st will read and apply the system and user's

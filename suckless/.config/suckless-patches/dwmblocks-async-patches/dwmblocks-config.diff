@@ -1,5 +1,5 @@
---- /home/wade/.local/src/dwmblocks-async/config.h	2026-02-10 01:17:55.937495529 +0800
-+++ /home/wade/.local/src/dwmblocks-async/config_1.h	2026-02-09 12:41:37.154117111 +0800
+--- config.h	2026-02-16 02:15:14.641189563 +0800
++++ config_1.h	2026-02-16 02:17:16.075767577 +0800
 @@ -18,15 +18,15 @@
  
  // Define blocks for the status feed as X(icon, cmd, interval, signal).
@@ -13,15 +13,16 @@
 -    X("", "sb-record", 0, 7)  \
 -    X("", "sb-volume", 0, 8)  \
 -    X("", "sb-battery", 5, 9) \
+-    X("", "sb-date", 1, 10)
 +    X("", "dwmblocks-music-status", 0, 2)   \
-+    X("", "info-wireless", 60, 7)   \
-+    X("", "info-bluetooth", 0, 3)   \
++    X("", "dwmblocks-wireless", 60, 7)   \
++    X("", "dwmblocks-bluetooth", 0, 3)   \
 +    X("", "dwmblocks-mic-toggle", 0, 6)     \
 +    X(" ", "info-memory", 3, 4) \
 +    X(" ", "info-cpu", 5, 5) \
 +    X("", "dwmblocks-brightness-control", 0, 1)  \
 +    X("", "dwmblocks-volume-control", 0, 8)  \
 +    X("", "info-battery", 60, 9) \
-     X("", "sb-date", 1, 10)
++    X("", "dwmblocks-date", 1, 10)
  
  #endif  // CONFIG_H

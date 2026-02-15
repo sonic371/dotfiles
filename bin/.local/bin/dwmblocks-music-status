@@ -18,5 +18,4 @@ esac
 
 song="$(playerctl metadata --format="{{title}} - {{artist}}")" || exit 2
 
-. sb-theme
-display "$icon $song"
+echo "$icon $song"

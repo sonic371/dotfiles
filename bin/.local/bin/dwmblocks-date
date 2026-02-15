@@ -50,5 +50,4 @@ case $BLOCK_BUTTON in
         ;;
 esac
 
-. sb-theme
-display "󰥔 $(date '+%H:%M:%S')"
+echo "󰥔 $(date '+%H:%M:%S')"

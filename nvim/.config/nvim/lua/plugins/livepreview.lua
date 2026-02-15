@@ -4,17 +4,8 @@ return {
     "nvim-telescope/telescope.nvim",
   },
   keys = {
-    -- LivePreview: close current preview and pick new file
-    { "<leader>lp", function()
-        vim.cmd("LivePreview close")
-        -- Save current buffer if modified before picking new file
-        if vim.bo.modified then
-          vim.cmd("write")
-        end
-        vim.cmd("LivePreview pick")
-      end,
-      desc = "LivePreview: Close & Pick new file"
-    },
+    -- LivePreview: start preview
+    { "<leader>lp", "<cmd>LivePreview start<CR>", desc = "LivePreview: Start" },
     -- Close preview
     { "<leader>lc", "<cmd>LivePreview close<CR>", desc = "LivePreview: Close" },
   },

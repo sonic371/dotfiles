@@ -19,14 +19,14 @@
 // Define blocks for the status feed as X(icon, cmd, interval, signal).
 #define BLOCKS(X)             \
     X("", "dwmblocks-music-status", 0, 2)   \
-    X("", "info-wireless", 60, 7)   \
-    X("", "info-bluetooth", 0, 3)   \
+    X("", "dwmblocks-wireless", 60, 7)   \
+    X("", "dwmblocks-bluetooth", 0, 3)   \
     X("", "dwmblocks-mic-toggle", 0, 6)     \
     X(" ", "info-memory", 3, 4) \
     X(" ", "info-cpu", 5, 5) \
     X("", "dwmblocks-brightness-control", 0, 1)  \
     X("", "dwmblocks-volume-control", 0, 8)  \
     X("", "info-battery", 60, 9) \
-    X("", "sb-date", 1, 10)
+    X("", "dwmblocks-date", 1, 10)
 
 #endif  // CONFIG_H

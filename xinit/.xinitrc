@@ -32,14 +32,16 @@ mega-sync >/dev/null 2>&1
 
 # === POWER MANAGEMENT ===
 # Disable screensaver and DPMS
-xset s off
-xset -dpms
-xset -b
+#xset s off
+#xset -dpms
+#xset -b
+xset s 2100 2100
+xset dpms 2100 2100 2100
 
 # Auto-suspend with xidlehook
 xidlehook \
   --not-when-audio \
-  --timer 60 'xset dpms force off' '' \
+  --timer 300 'xset dpms force off' '' \
   --timer 2070 'notify-send "Suspending in 30 seconds"' '' \
   --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
   &

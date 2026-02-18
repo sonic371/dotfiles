@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Check if script is run with sudo
+if [ "$EUID" -ne 0 ]; then
+    echo "This script requires sudo privileges to install packages and change shell."
+    echo "Please run it with: sudo $0"
+    exit 1
+fi
+
 # Exit on error
 set -e
 
@@ -24,13 +31,12 @@ sudo pacman -S --noconfirm xorg-xinit xorg-server libxinerama libxft imlib2
 echo "Changing default shell to zsh..."
 chsh -s /usr/bin/zsh
 
-# Install Oh My Zsh (non-interactively)
+# Install Oh My Zsh (at the end)
 echo "Installing Oh My Zsh..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # Clone and stow dotfiles
 echo "Setting up dotfiles..."
-git clone https://github.com/sonic371/dotfiles.git ~/dotfiles
 cd ~/dotfiles && stow -t ~ zshrc
 
 # Clone additional repositories

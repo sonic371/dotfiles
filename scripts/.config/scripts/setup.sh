@@ -59,5 +59,21 @@ else
     echo "Oh My Zsh already installed, skipping..."
 fi
 
+# Install zsh-autosuggestions
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+    echo "Installing zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+else
+    echo "zsh-autosuggestions already installed, skipping..."
+fi
+
+# Install zsh-syntax-highlighting
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
+    echo "Installing zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+else
+    echo "zsh-syntax-highlighting already installed, skipping..."
+fi
+
 echo "Setup complete!"
 echo "NOTE: You may need to log out and back in for shell changes to take effect."

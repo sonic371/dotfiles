@@ -9,16 +9,16 @@ set -x
 echo "Starting system setup..."
 
 # Update system first
-run_sudo pacman -Syu --noconfirm
+sudo pacman -Syu --noconfirm
 
 # Install core packages
-run_sudo pacman -S --noconfirm fd ripgrep fzf zoxide eza git stow yazi zsh
+sudo pacman -S --noconfirm fd ripgrep fzf zoxide eza git stow yazi zsh
 
 # Install base development tools
-run_sudo pacman -S --needed --noconfirm base-devel
+sudo pacman -S --needed --noconfirm base-devel
 
 # Install Xorg and related packages
-run_sudo pacman -S --noconfirm xorg-xinit xorg-server libxinerama libxft imlib2
+sudo pacman -S --noconfirm xorg-xinit xorg-server libxinerama libxft imlib2
 
 # Change default shell to zsh
 echo "Changing default shell to zsh..."

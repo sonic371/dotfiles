@@ -1,0 +1,5 @@
+#!/bin/sh
+xwinwrap -g 1920x1080 -ni -s -nf -b -un -fdt -argb -- \
+    mpv --mute=yes --no-audio --no-osc --no-osd-bar --quiet \
+    --wid=%WID --loop-playlist --shuffle --no-resume-playback \
+    --panscan=1.0 --geometry=1920x1080+0+0 ~/Videos/Hidamari/*.{webm,mp4}

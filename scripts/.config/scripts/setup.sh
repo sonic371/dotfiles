@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
-# Print commands as they're executed
-set -x
+# Exit on error and Print commands as they're executed
+set -ex
 
 echo "Starting system setup..."
 
@@ -12,7 +9,7 @@ echo "Starting system setup..."
 sudo pacman -Syu --noconfirm
 
 # Install core packages
-sudo pacman -S --noconfirm fd ripgrep fzf zoxide eza git stow yazi zsh
+sudo pacman -S --noconfirm fd ripgrep fzf zoxide eza git git-lfs stow yazi zsh
 
 # Install base development tools
 sudo pacman -S --needed --noconfirm base-devel
@@ -54,7 +51,7 @@ fi
 # Install Oh My Zsh (only if not already installed)
 echo "Installing Oh My Zsh..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 else
     echo "Oh My Zsh already installed, skipping..."
 fi

@@ -21,5 +21,26 @@ case "${BLOCK_BUTTON:-}" in
         ;;
 esac
 
-sig=$(awk '/wlp1s0:/ {gsub(/\.$/,"",$4); print $4}' /proc/net/wireless 2>/dev/null)
-[[ -n $sig ]] && echo "󰖩 (${sig}dBm)" || echo "󰤭"
+# Check WiFi signal
+wifi_sig=$(awk '/wlp1s0:/ {gsub(/\.$/,"",$4); print $4}' /proc/net/wireless 2>/dev/null)
+
+# Check Ethernet carrier
+eth_carrier=$(cat /sys/class/net/eno1/carrier 2>/dev/null)
+
+# Determine output
+if [[ -n $wifi_sig ]]; then
+    # WiFi connected
+    echo "󰖩 (${wifi_sig}dBm)"
+elif [[ $eth_carrier == 1 ]]; then
+    # Ethernet connected
+    # Optional: get speed if available
+    speed=$(cat /sys/class/net/eno1/speed 2>/dev/null)
+    if [[ -n $speed ]] && [[ $speed -ne -1 ]]; then
+        echo "󰈀 (${speed}Mbps)"
+    else
+        echo "󰈀"
+    fi
+else
+    # No connection
+    echo "󰤭"
+fi

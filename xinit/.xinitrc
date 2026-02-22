@@ -48,6 +48,6 @@ xidlehook \
 
 #Load st color 
 xrdb -merge ~/.Xresources
-
+live-wallpaper
 # === FINAL: START DWM ===
 exec dwm

@@ -1,5 +1,36 @@
 #!/bin/sh
-xwinwrap -g 1920x1080 -ni -s -nf -b -un -fdt -argb -- \
-    mpv --mute=yes --no-audio --no-osc --no-osd-bar --quiet \
-    --wid=%WID --loop-playlist --shuffle --no-resume-playback \
-    --panscan=1.0 --geometry=1920x1080+0+0 ~/Videos/Hidamari/*.{webm,mp4}
+
+# Video wallpaper configuration
+VIDEO_DIR="$HOME/Videos/Hidamari"
+
+# xwinwrap options
+XW_OPTS="-fs -ni -s -nf -b -un -ov -d"
+
+# mpv options
+MPV_OPTS="--mute=yes --no-audio --no-osc --no-osd-bar --quiet"
+MPV_OPTS="$MPV_OPTS --screen=0 -wid WID"
+MPV_OPTS="$MPV_OPTS --loop-playlist --shuffle --no-resume-playback"
+MPV_OPTS="$MPV_OPTS --hwdec=auto --stop-screensaver=no"
+
+# Performance optimizations
+MPV_OPTS="$MPV_OPTS --video-sync=display-resample"
+MPV_OPTS="$MPV_OPTS --scale=bilinear"
+
+# Debug: Show what files we're trying to match
+echo "Looking for videos in: $VIDEO_DIR"
+echo "Matching pattern: $VIDEO_DIR/*.mp4 $VIDEO_DIR/*.webm"
+
+# Count files using glob
+mp4_count=$(ls "$VIDEO_DIR"/*.mp4 2>/dev/null | wc -l)
+webm_count=$(ls "$VIDEO_DIR"/*.webm 2>/dev/null | wc -l)
+total_count=$((mp4_count + webm_count))
+
+echo "Found $mp4_count .mp4 files and $webm_count .webm files"
+
+if [ $total_count -gt 0 ]; then
+    echo "Launching video wallpaper with $total_count videos..."
+    xwinwrap $XW_OPTS -- mpv $MPV_OPTS "$VIDEO_DIR"/*.mp4 "$VIDEO_DIR"/*.webm
+else
+    echo "Error: No videos found in $VIDEO_DIR"
+    exit 1
+fi

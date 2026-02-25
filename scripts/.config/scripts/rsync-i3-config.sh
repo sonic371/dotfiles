@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Define source and destination directories
 SOURCE_DIR="/home/wade/.config/i3/"

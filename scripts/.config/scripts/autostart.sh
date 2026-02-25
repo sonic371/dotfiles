@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # --- Essential services ---
 # Restart sxhkd to avoid multiple instances on reload

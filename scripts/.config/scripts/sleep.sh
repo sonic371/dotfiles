@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # ~/.config/i3/sleep.sh
 
 PID_FILE="/tmp/timer_pids.$$"

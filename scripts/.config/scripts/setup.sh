@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Exit on error and Print commands as they're executed
 set -ex

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 xdotool mousemove 1733 15 
 sleep 0.5

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # ~/.local/bin/cancel-with-pids.sh
 
 # Find and kill all timer processes

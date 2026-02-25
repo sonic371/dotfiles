@@ -12,6 +12,7 @@ SAVEHIST=10000
 
 setopt append_history           # Append to history instead of overwriting
 setopt extended_history         # Save timestamps and duration
+setopt hist_fcntl_lock          # Use system file locking to prevent corruption
 setopt hist_ignore_dups         # Don't save duplicate commands
 setopt hist_ignore_all_dups     # Don't show duplicate history entries
 setopt hist_reduce_blanks       # Remove superfluous blanks from commands

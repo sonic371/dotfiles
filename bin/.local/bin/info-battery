@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 bat="/sys/class/power_supply/BAT0"
 [ ! -d "$bat" ] && exit 0
 

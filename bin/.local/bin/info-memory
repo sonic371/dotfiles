@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 while IFS= read -r line; do
     if [[ $line == MemTotal:* ]]; then
         t=${line#MemTotal:}

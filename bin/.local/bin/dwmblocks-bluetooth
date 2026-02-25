@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # Get connected Bluetooth device name
 
 # Set default terminal if not defined

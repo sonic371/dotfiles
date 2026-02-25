@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # create-vm.sh - Create VM from VDI template with conflict handling
 
 set -e

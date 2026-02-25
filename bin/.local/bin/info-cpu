@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 read -r cpu u n s i iw ir si st _ < /proc/stat
 sleep 1
 read -r cpu u2 n2 s2 i2 iw2 ir2 si2 st2 _ < /proc/stat

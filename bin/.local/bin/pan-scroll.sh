@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 THRESHOLD=6
 SPEED=0.03

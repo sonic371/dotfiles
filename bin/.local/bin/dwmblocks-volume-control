@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 # Volume script using pactl with 150% limit
 
 # Define terminal options

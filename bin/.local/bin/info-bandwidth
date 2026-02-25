@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 interface="wlp1s0"  # or your interface
 
 rx_file="/sys/class/net/$interface/statistics/rx_bytes"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 percent=$(brightnessctl -m | cut -d, -f4 | tr -d '%' 2>/dev/null)
 
 case "${BLOCK_BUTTON:-}" in

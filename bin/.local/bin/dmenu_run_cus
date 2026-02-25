@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+
+# Get commands from dmenu_path (assuming it's in PATH)
+commands=$(dmenu_path_cus | sed 's/^/CMD: /')
+
+# Get desktop applications from dmenu_desktop (assuming it's in PATH)
+applications=$(dmenu_desktop_cus | sed 's/^/APP: /')
+
+# Combine lists (apps first since there are fewer of them)
+combined_list=$(printf "%s\n%s\n" "$applications" "$commands")
+
+# Use dmenu from PATH with case-insensitive matching by default
+selected_item=$(printf "%s\n" "$combined_list" | dmenu -i "$@" | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+if [ -n "$selected_item" ]; then
+    # Check if it's a command or app based on prefix
+    case "$selected_item" in
+        "CMD: "*)
+            # Extract command name (remove "CMD: " prefix)
+            command=$(printf "%s" "$selected_item" | sed 's/^CMD: //')
+            ${SHELL:-/bin/sh} -c "$command" &
+            ;;
+        "APP: "*)
+            # Extract app name (remove "APP: " prefix)
+            app_name=$(printf "%s" "$selected_item" | sed 's/^APP: //')
+            # Get the actual exec command from dmenu_desktop
+            exec_command=$(dmenu_desktop "$app_name")
+            if [ -n "$exec_command" ]; then
+                ${SHELL:-/bin/sh} -c "$exec_command" &
+            fi
+            ;;
+        *)
+            # Fallback for anything else
+            ${SHELL:-/bin/sh} -c "$selected_item" &
+            ;;
+    esac
+fi

@@ -76,7 +76,7 @@ XTerm*vt100.translations: #override \
     Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
     Ctrl Shift <Key>V: insert-selection(CLIPBOARD)
 
-st.font: Bm437 DOS/V re. JPN24:pixelsize=24:antialias=false
+st.font: Px437 DOS/V re. JPN24:pixelsize=24:antialias=false
 st.alpha: 0.8
 
 st.background: #000000

@@ -27,13 +27,7 @@ if command -v fzf &>/dev/null; then
   '
 
   # Source fzf key bindings and fuzzy completion if available
-  if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
-    source /usr/share/fzf/key-bindings.zsh
-  fi
-
-  if [[ -f /usr/share/fzf/completion.zsh ]]; then
-    source /usr/share/fzf/completion.zsh
-  fi
+  eval "$(fzf --zsh)"
 
 fi
 

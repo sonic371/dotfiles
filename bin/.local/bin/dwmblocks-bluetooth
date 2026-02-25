@@ -23,12 +23,16 @@ case "$BLOCK_BUTTON" in
 esac
 
 if bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; then
-    device=$(bluetoothctl info 2>/dev/null | awk '/Name:/ {print $2}')
+    device=$(bluetoothctl info 2>/dev/null | awk -F': ' '/Name:/ {print $2}')
     if [[ -n $device ]]; then
         # Truncate long names
         [[ ${#device} -gt 15 ]] && device="${device:0:12}..."
         echo "󰂯 $device"
     else
-        echo "󰂯"
+        echo "󰂯"  # Powered on but no device connected
     fi
+else
+    echo "󰂲"  # Bluetooth off
 fi
+
+exit 0

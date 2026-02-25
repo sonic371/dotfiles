@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 cachedir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
 cache_file="$cachedir/dmenu_desktop_cache"

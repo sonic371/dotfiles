@@ -4,7 +4,7 @@
 # Single responsibility: Set global environment variables
 
 # Editor and terminal
-export EDITOR="/usr/bin/nvim"
+export EDITOR=nvim
 export TERMINAL=st
 
 # Application-specific paths

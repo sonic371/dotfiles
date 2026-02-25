@@ -39,7 +39,7 @@ XF86Favorites
 	maim -s ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png
 
 super + space
-	dmenu_run -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
+	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
 
 XF86AudioPrev
 	xdotool click --repeat 5 4

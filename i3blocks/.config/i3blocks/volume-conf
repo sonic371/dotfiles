@@ -1,6 +1,0 @@
-[volume]
-label=♪
-label=VOL
-interval=once
-signal=10
-STEP=5%

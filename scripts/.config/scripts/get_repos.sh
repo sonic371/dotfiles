@@ -6,18 +6,10 @@ set -e  # Exit on error
 # Create base directory for source code
 mkdir -p "$HOME/.local/src"
 
-# Clone dotfiles repository
-if [ ! -d "$HOME/dotfiles" ]; then
-    echo "Cloning dotfiles..."
-    git clone https://github.com/sonic371/dotfiles.git "$HOME/dotfiles"
-else
-    echo "dotfiles already exists, skipping..."
-fi
-
 # Clone st-flexipatch
 if [ ! -d "$HOME/.local/src/st-flexipatch" ]; then
     echo "Cloning st-flexipatch..."
-    git clone https://github.com/bakkeby/st-flexipatch.git "$HOME/.local/src/st-flexipatch"
+    git clone https://github.com/sonic371/st-flexipatch.git "$HOME/.local/src/st-flexipatch"
 else
     echo "st-flexipatch already exists, skipping..."
 fi

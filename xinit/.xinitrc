@@ -34,7 +34,7 @@ mega-sync >/dev/null 2>&1
 # Disable screensaver and DPMS
 #xset s off
 #xset -dpms
-#xset -b
+xset -b
 xset s 2100 2100
 xset dpms 2100 2100 2100
 
@@ -48,6 +48,6 @@ xidlehook \
 
 #Load st color 
 xrdb -merge ~/.Xresources
-live-wallpaper
+
 # === FINAL: START DWM ===
 exec dwm

@@ -15,6 +15,7 @@ local function setup_keymaps()
   vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to window above" })
   vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
   vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+  vim.keymap.set('n', '<leader>e', vim.cmd.Ex, { desc = 'Open netrw' })
 
   -- Tab navigation
   vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab" })

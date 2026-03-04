@@ -34,13 +34,16 @@ xset dpms 2100 2100 2100
 # Auto-suspend with xidlehook
 xidlehook \
   --not-when-audio \
-#  --timer 300 'xset dpms force off' '' \
-  --timer 2070 'notify-send "Suspending in 30 seconds"' '' \
   --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
+  &
+
+xidlehook \
+  --not-when-audio \
+  --timer 300 'xset dpms force off' '' \
   &
 
 #Load st color 
 xrdb -merge ~/.Xresources
-
+autorandr -c
 # === FINAL: START DWM ===
 exec dwm

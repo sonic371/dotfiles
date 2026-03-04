@@ -1,0 +1,1 @@
+ACTION=="bind", SUBSYSTEM=="hid", ENV{HID_NAME}=="Function Trackpad", RUN+="/home/wade/dotfiles/scripts/.config/scripts/udev-function-trackpad.sh"

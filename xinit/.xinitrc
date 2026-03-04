@@ -2,26 +2,19 @@
 # ~/.xinitrc - Complete but minimal startup
 
 # === KILL EXISTING INSTANCES ===
-pkill dunst
-pkill picom
-pkill dwmblocks
-pkill dwmblocks-musicup
-pkill unclutter
-pkill fcitx5
-pkill mega-sync
-pkill xidlehook
-pkill sxhkd
+killall -q dunst picom dwmblocks dwmblocks-musicup unclutter fcitx5 mega-sync xidlehook sxhkd
 
 # === ESSENTIAL SERVICES (sequential) ===
 dunst &
 picom &
-sxhkd &
+(setsid env PATH="$HOME/.local/bin:$PATH" sxhkd 2>/tmp/sxhkd.log &) & disown
 dwmblocks &
 dwmblocks-musicup &
 
 # === DISPLAY & INPUT (blocking) ===
 ~/.config/scripts/wallpaper.sh
 ~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1
+setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
 
 # === SYSTEM UTILITIES (background) ===
 unclutter -idle 3 &
@@ -41,7 +34,7 @@ xset dpms 2100 2100 2100
 # Auto-suspend with xidlehook
 xidlehook \
   --not-when-audio \
-  --timer 300 'xset dpms force off' '' \
+#  --timer 300 'xset dpms force off' '' \
   --timer 2070 'notify-send "Suspending in 30 seconds"' '' \
   --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
   &

@@ -18,7 +18,6 @@ zsh_config_files=(
   options.zsh
   dotfiles.zsh
   ssh.zsh
-  swap-ralt.zsh
 )
 
 # Source each configuration file if it exists.

@@ -1,0 +1,1 @@
+ACTION=="bind", SUBSYSTEM=="hid", ENV{HID_NAME}=="HUKE T3 Pro", RUN+="/home/wade/dotfiles/scripts/.config/scripts/udev-huke-trackpad.sh"

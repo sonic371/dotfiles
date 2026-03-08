@@ -11,4 +11,5 @@ vim.g.netrw_winsize = 75         -- Set initial width
 vim.g.netrw_altv = 1             -- Split to the right
 vim.g.netrw_preview = 1          -- Preview in a vertical split
 vim.g.netrw_keepdir = 0          -- Keep current directory as you navigate
-
+vim.opt.relativenumber = true  -- Enable relative line numbers
+vim.opt.number = true          -- Show absolute line number on current line

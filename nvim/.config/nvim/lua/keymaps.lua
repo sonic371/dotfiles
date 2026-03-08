@@ -32,7 +32,8 @@ local function setup_keymaps()
   vim.keymap.set("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Force quit" })
 
   -- Yank to system clipboard
-  vim.keymap.set("n", "<leader>Y", '%y', { desc = "Yank all to clipboard" })
+  vim.keymap.set("n", "<leader>D", "<cmd>%d_<CR>", { desc = "Delete all without buffer" })
+  vim.keymap.set("n", "<leader>Y", "<cmd>%y+<CR>", { desc = "Yank all to clipboard" })
 end
 
 return {

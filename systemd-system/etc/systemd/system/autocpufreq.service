@@ -1,0 +1,12 @@
+[Unit]
+Description=auto-cpufreq - Automatic CPU speed & power optimizer
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/autocpufreq --daemon
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

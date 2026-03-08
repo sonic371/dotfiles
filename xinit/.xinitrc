@@ -39,7 +39,7 @@ xidlehook \
 
 xidlehook \
   --not-when-audio \
-  --timer 300 'xset dpms force off' '' \
+  --timer 600 'xset dpms force off' '' \
   &
 
 #Load st color 

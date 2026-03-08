@@ -1,0 +1,12 @@
+[Unit]
+Description=Disable Microphone Mute LED
+After=sysinit.target
+Before=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c "echo 0 > /sys/class/leds/platform::micmute/brightness"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

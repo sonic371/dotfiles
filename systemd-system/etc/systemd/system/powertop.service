@@ -1,0 +1,12 @@
+[Unit]
+Description=PowerTOP auto-tune
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/powertop --auto-tune
+# Set to 'yes' if powertop fails; it may need to wait for other services
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

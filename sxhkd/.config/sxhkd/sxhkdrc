@@ -1,3 +1,4 @@
+# Essentials
 XF86AudioMute
 	pactl set-sink-mute @DEFAULT_SINK@ toggle 2>/dev/null && kill -42 $(pidof dwmblocks)
 
@@ -16,37 +17,55 @@ XF86MonBrightnessDown
 XF86MonBrightnessUp
 	brightnessctl s +10% >/dev/null && kill -35 $(pidof dwmblocks)
 
+# Screenshot functions
+@Print
+	maim -s | xclip -selection clipboard -t image/png
+
+@shift + Print
+	maim -s ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png
+
+# Dmenu
+super + space
+	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
+
+# Exec define script
+super + d
+	~/.config/scripts/dmenu_define
+
+# Thinkpad media keys (all mapped to redshift-toggle)
 XF86Display
 	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
 
-XF86Messenger
-	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
-
-XF86Go
-	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
-
-Cancel
-	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+#XF86Messenger
+#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+#
+#XF86Go
+#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+#
+#Cancel
+#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
 
 XF86Favorites
 	/home/wade/.local/bin/tool-middle-buttom-toggle
 
-@Print
-	maim -s | xclip -selection clipboard -t image/png
-
-# Screenshot region to file
-@shift + Print
-	maim -s ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png
-
-super + space
-	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
-
+# Model B1: Click navigation
 XF86AudioPrev
-	xdotool click --repeat 5 4
+	xdotool click --repeat 3 4
 
 XF86AudioNext
-	xdotool click --repeat 5 5
+	xdotool click --repeat 3 5
 
-# XF86WWW; @XF86WWW
-#	~/.local/bin/pan-scroll.sh
+XF86AudioPlay
+	playerctl play-pause
 
+XF86Back
+	xdotool key ctrl+plus
+
+XF86HomePage
+	xdotool key ctrl+minus
+
+XF86Mail
+	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+
+XF86WWW
+	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && kill -42 $(pidof dwmblocks)

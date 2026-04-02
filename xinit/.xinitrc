@@ -13,7 +13,7 @@ done
 
 # === ESSENTIAL SETUP (synchronous) ===
 # Display setup
-# ~/.config/scripts/wallpaper.sh || echo "Warning: wallpaper.sh failed"
+~/.config/scripts/wallpaper.sh || echo "Warning: wallpaper.sh failed"
 ~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1 || echo "Warning: touchpad-setup.sh failed"
 setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
 xrdb -merge ~/.Xresources 2>/dev/null

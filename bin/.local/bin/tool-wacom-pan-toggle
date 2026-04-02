@@ -1,32 +1,28 @@
 #!/bin/sh
-STATE_FILE="/tmp/wacom_pan_state"
 DEVICE="Wacom Intuos BT S Pen stylus"
 
 # Check if the device exists
 if ! xsetwacom --list devices | grep -q "$DEVICE"; then
+    notify-send -u critical "Wacom Script Error" "Wacom device not found"
     echo "Error: Wacom device not found"
     exit 1
 fi
 
-# Read current state (default to empty if file doesn't exist)
-if [ -f "$STATE_FILE" ]; then
-    CURRENT_STATE=$(cat "$STATE_FILE")
-else
-    CURRENT_STATE=""
-fi
+# Get the actual current button mapping from the device
+CURRENT_BUTTON=$(xsetwacom --get "$DEVICE" Button 2)
 
-# Toggle between pan and button +2
-if [ "$CURRENT_STATE" = "pan" ]; then
+# Determine current mode based on actual device state
+# When in pan mode, CURRENT_BUTTON is empty
+# When in button mode, CURRENT_BUTTON is "button +2"
+if [ -z "$CURRENT_BUTTON" ]; then
+    # Currently in pan mode, switch to button mode
     echo "Switching to button mode..."
+    notify-send -t 2000 "Wacom Mode" "Switching to button mode..."
     xsetwacom --set "$DEVICE" Button 2 "button +2"
-    NEW_STATE="button"
 else
+    # Currently in button mode, switch to pan mode
     echo "Switching to pan mode..."
+    notify-send -t 2000 "Wacom Mode" "Switching to pan mode..."
     xsetwacom --set "$DEVICE" Button 2 "pan"
     xsetwacom --set "$DEVICE" "PanScrollThreshold" 200
-    NEW_STATE="pan"
 fi
-
-# Save the new state
-echo "$NEW_STATE" > "$STATE_FILE"
-echo "Current state: $NEW_STATE"

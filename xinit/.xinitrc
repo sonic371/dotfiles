@@ -1,49 +1,60 @@
 #!/bin/sh
-# ~/.xinitrc - Complete but minimal startup
+
+# === CONFIGURATION ===
+IDLE_TIMEOUT=2100      # 35 minutes
+LOCK_TIMEOUT=600       # 10 minutes
+UNCLUTTER_IDLE=3
 
 # === KILL EXISTING INSTANCES ===
-killall -q dunst picom dwmblocks dwmblocks-musicup unclutter fcitx5 mega-sync xidlehook sxhkd
+echo "Cleaning up existing processes..."
+for p in dunst picom dwmblocks dwmblocks-musicup unclutter fcitx5 mega-sync xidlehook sxhkd; do
+    killall -q "$p" 2>/dev/null
+done
 
-# === ESSENTIAL SERVICES (sequential) ===
-dunst &
-picom &
-(setsid env PATH="$HOME/.local/bin:$PATH" sxhkd 2>/tmp/sxhkd.log &) & disown
+# === ESSENTIAL SETUP (synchronous) ===
+# Display setup (must complete before dwm)
+# ~/.config/scripts/wallpaper.sh || echo "Warning: wallpaper.sh failed"
+~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1 || echo "Warning: touchpad-setup.sh failed"
+setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
+xrdb -merge ~/.Xresources 2>/dev/null
+autorandr -c 2>/dev/null
+
+# === START SERVICES ===
+# Status bar components
 dwmblocks &
 dwmblocks-musicup &
 
-# === DISPLAY & INPUT (blocking) ===
-~/.config/scripts/wallpaper.sh
-~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1
-setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
+# Notification daemon
+dunst &
 
-# === SYSTEM UTILITIES (background) ===
-unclutter -idle 3 &
+# Compositor (start after display setup)
+picom &
 
-# === APPLICATIONS (background) ===
+# Hotkey daemon
+(setsid env PATH="$HOME/.local/bin:$PATH" sxhkd 2>/tmp/sxhkd.log) &
+
+# System utilities
+unclutter -idle "$UNCLUTTER_IDLE" &
+
+# Applications
 fcitx5 -d >/dev/null 2>&1 &
-mega-sync >/dev/null 2>&1
+mega-sync >/dev/null 2>&1 &
 
 # === POWER MANAGEMENT ===
-# Disable screensaver and DPMS
-#xset s off
-#xset -dpms
-xset -b
-xset s 2100 2100
-xset dpms 2100 2100 2100
+xset -b                           # Disable beep
+xset s "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"     # Screensaver
+xset dpms "$IDLE_TIMEOUT" "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"  # DPMS
 
-# Auto-suspend with xidlehook
+# Single xidlehook instance with chained actions
 xidlehook \
-  --not-when-audio \
-  --timer 2100 'i3lock --nofork -c 000000 & systemctl suspend' '' \
-  &
+    --not-when-audio \
+    --timer "$IDLE_TIMEOUT" 'i3lock --nofork -c 000000' ''\
+    --timer "$IDLE_TIMEOUT" 'systemctl suspend' ''\
+    --timer 600 'xset dpms force off' ''\
+    &
 
-xidlehook \
-  --not-when-audio \
-  --timer 600 'xset dpms force off' '' \
-  &
+# Wait briefly for critical services
+# sleep 1
 
-#Load st color 
-xrdb -merge ~/.Xresources
-autorandr -c
-# === FINAL: START DWM ===
+# === START WINDOW MANAGER ===
 exec dwm

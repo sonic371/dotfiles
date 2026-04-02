@@ -12,7 +12,7 @@ for p in dunst picom dwmblocks dwmblocks-musicup unclutter fcitx5 mega-sync xidl
 done
 
 # === ESSENTIAL SETUP (synchronous) ===
-# Display setup (must complete before dwm)
+# Display setup
 # ~/.config/scripts/wallpaper.sh || echo "Warning: wallpaper.sh failed"
 ~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1 || echo "Warning: touchpad-setup.sh failed"
 setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
@@ -52,9 +52,6 @@ xidlehook \
     --timer "$IDLE_TIMEOUT" 'systemctl suspend' ''\
     --timer 600 'xset dpms force off' ''\
     &
-
-# Wait briefly for critical services
-# sleep 1
 
 # === START WINDOW MANAGER ===
 exec dwm

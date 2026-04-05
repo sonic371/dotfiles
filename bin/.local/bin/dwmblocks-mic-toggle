@@ -6,8 +6,7 @@ case "$BLOCK_BUTTON" in
 esac
 
 if pactl get-source-mute @DEFAULT_SOURCE@ | grep -q "^Mute: no"; then
-    display " "
+    echo " "
 else
-    display "󰍭 "
+    echo "󰍭 "
 fi
-    

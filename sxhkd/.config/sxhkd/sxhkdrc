@@ -1,21 +1,39 @@
 # Essentials
 XF86AudioMute
-	pactl set-sink-mute @DEFAULT_SINK@ toggle 2>/dev/null && kill -42 $(pidof dwmblocks)
+	~/.config/scripts/volume-toggle 2>/dev/null &&
 
 XF86AudioLowerVolume
-	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && \
+	kill -42 $(pidof dwmblocks) && \
+        VOL=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1) && \
+        dunstify -r 999 -u low -t 1000 -h int:value:"${VOL%\%}" "Volume: $VOL" -h string:hlcolor:#ffffff
 
 XF86AudioRaiseVolume
-	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && \
+	kill -42 $(pidof dwmblocks) && \
+	VOL=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1) && \
+        dunstify -r 999 -u low -t 1000 -h int:value:"${VOL%\%}" "Volume: $VOL" -h string:hlcolor:#ffffff
+
+# Brightness down with notification
+XF86MonBrightnessDown
+        brightnessctl s 10%- >/dev/null && \
+        kill -35 $(pidof dwmblocks) && \
+        BRIGHT=$(brightnessctl g) && \
+        MAX=$(brightnessctl m) && \
+        PERCENT=$((BRIGHT * 100 / MAX)) && \
+        dunstify -r 998 -u low -t 1000 -h int:value:"$PERCENT" "Brightness: ${PERCENT}%" -h string:hlcolor:#ffffff
+
+# Brightness up with notification
+XF86MonBrightnessUp
+        brightnessctl s +10% >/dev/null && \
+        kill -35 $(pidof dwmblocks) && \
+        BRIGHT=$(brightnessctl g) && \
+        MAX=$(brightnessctl m) && \
+        PERCENT=$((BRIGHT * 100 / MAX)) && \
+        dunstify -r 998 -u low -t 1000 -h int:value:"$PERCENT" "Brightness: ${PERCENT}%" -h string:hlcolor:#ffffff
 
 XF86AudioMicMute
-	pactl set-source-mute @DEFAULT_SOURCE@ toggle && kill -40 $(pidof dwmblocks)
-
-XF86MonBrightnessDown
-	brightnessctl s 10%- >/dev/null && kill -35 $(pidof dwmblocks)
-
-XF86MonBrightnessUp
-	brightnessctl s +10% >/dev/null && kill -35 $(pidof dwmblocks)
+	~/.config/scripts/mic-toggle 2>/dev/null &&
 
 # Screenshot functions
 @Print

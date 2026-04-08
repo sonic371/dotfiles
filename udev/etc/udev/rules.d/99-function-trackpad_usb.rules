@@ -1,0 +1,1 @@
+ACTION=="bind", SUBSYSTEM=="hid", ENV{HID_ID}=="0003:000005AC:00000265", RUN+="/home/wade/dotfiles/scripts/.config/scripts/udev-function-trackpad_usb.sh"

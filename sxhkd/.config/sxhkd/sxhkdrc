@@ -1,6 +1,6 @@
 # Essentials
 XF86AudioMute
-	~/.config/scripts/volume-toggle 2>/dev/null &&
+	~/.config/scripts/toggle-volume 2>/dev/null &&
 
 XF86AudioLowerVolume
 	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && \
@@ -33,7 +33,7 @@ XF86MonBrightnessUp
         dunstify -r 998 -u low -t 1000 -h int:value:"$PERCENT" "Brightness: ${PERCENT}%" -h string:hlcolor:#ffffff
 
 XF86AudioMicMute
-	~/.config/scripts/mic-toggle 2>/dev/null &&
+	~/.config/scripts/toggle-mic 2>/dev/null &&
 
 # Screenshot functions
 @Print
@@ -45,7 +45,7 @@ super + space
 
 # Exec define script
 super + d
-	~/.config/scripts/dmenu_define
+	~/.config/scripts/dmenu_define.sh
 
 super + w
 	~/.config/scripts/record-webcam.sh

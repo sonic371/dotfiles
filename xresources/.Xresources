@@ -18,26 +18,26 @@ XTerm*vt100.translations: #override \
     Ctrl Shift <Key>V: insert-selection(CLIPBOARD)
 
 
-st.font: Px437 DOS/V re. JPN24:pixelsize=24:antialias=false
-st.alpha: 0.8
+*.font: Px437 DOS/V re. JPN24:pixelsize=24:antialias=false
+*.alpha: 0.8
 
-st.background: #000000
-st.foreground: #ffffff
+*.background: #000000
+*.foreground: #ffffff
 
-st.color0:  #15161e
-st.color1:  #f7768e
-st.color2:  #9ece6a
-st.color3:  #e0af68
-st.color4:  #7aa2f7
-st.color5:  #bb9af7
-st.color6:  #7dcfff
-st.color7:  #a9b1d6
+*.color0:  #15161e
+*.color1:  #f7768e
+*.color2:  #9ece6a
+*.color3:  #e0af68
+*.color4:  #7aa2f7
+*.color5:  #bb9af7
+*.color6:  #7dcfff
+*.color7:  #a9b1d6
 
-st.color8:  #414868
-st.color9:  #f7768e
-st.color10: #9ece6a
-st.color11: #e0af68
-st.color12: #7aa2f7
-st.color13: #bb9af7
-st.color14: #7dcfff
-st.color15: #c0caf5
+*.color8:  #414868
+*.color9:  #f7768e
+*.color10: #9ece6a
+*.color11: #e0af68
+*.color12: #7aa2f7
+*.color13: #bb9af7
+*.color14: #7dcfff
+*.color15: #c0caf5

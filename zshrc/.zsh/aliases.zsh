@@ -9,3 +9,6 @@ alias dots='cd ~/dotfiles && git status'
 
 # Neovim
 alias v='nvim'
+
+# Rebuild
+alias rebuild='git clean -fd && sudo make clean install'

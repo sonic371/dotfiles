@@ -1,43 +1,27 @@
 # Essentials
 XF86AudioMute
-	~/.config/scripts/toggle-volume 2>/dev/null &&
+	~/.config/scripts/sxhkd-toggle-volume.sh
 
 XF86AudioLowerVolume
-	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && \
-	kill -42 $(pidof dwmblocks) && \
-        VOL=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1) && \
-        dunstify -r 999 -u low -t 1000 -h int:value:"${VOL%\%}" "Volume: $VOL" -h string:hlcolor:#ffffff
+	~/.config/scripts/sxhkd-volume.sh down
 
 XF86AudioRaiseVolume
-	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && \
-	kill -42 $(pidof dwmblocks) && \
-	VOL=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -oP '\d+%' | head -1) && \
-        dunstify -r 999 -u low -t 1000 -h int:value:"${VOL%\%}" "Volume: $VOL" -h string:hlcolor:#ffffff
+	~/.config/scripts/sxhkd-volume.sh up
 
 # Brightness down with notification
 XF86MonBrightnessDown
-        brightnessctl s 10%- >/dev/null && \
-        kill -35 $(pidof dwmblocks) && \
-        BRIGHT=$(brightnessctl g) && \
-        MAX=$(brightnessctl m) && \
-        PERCENT=$((BRIGHT * 100 / MAX)) && \
-        dunstify -r 998 -u low -t 1000 -h int:value:"$PERCENT" "Brightness: ${PERCENT}%" -h string:hlcolor:#ffffff
+        ~/.config/scripts/sxhkd-brightness.sh down
 
 # Brightness up with notification
 XF86MonBrightnessUp
-        brightnessctl s +10% >/dev/null && \
-        kill -35 $(pidof dwmblocks) && \
-        BRIGHT=$(brightnessctl g) && \
-        MAX=$(brightnessctl m) && \
-        PERCENT=$((BRIGHT * 100 / MAX)) && \
-        dunstify -r 998 -u low -t 1000 -h int:value:"$PERCENT" "Brightness: ${PERCENT}%" -h string:hlcolor:#ffffff
+        ~/.config/scripts/sxhkd-brightness.sh up
 
 XF86AudioMicMute
-	~/.config/scripts/toggle-mic 2>/dev/null &&
+	~/.config/scripts/sxhkd-toggle-mic.sh
 
 # Screenshot functions
 @Print
-	maim -s | tee ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png | xclip -selection clipboard -t image/png
+	~/.config/scripts/sxhkd-maim.sh >/dev/null 2>&1
 
 # Dmenu
 super + space
@@ -83,7 +67,7 @@ XF86HomePage
 	xdotool key ctrl+minus
 
 XF86Mail
-	pactl set-sink-volume @DEFAULT_SINK@ +5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+	~/.config/scripts/sxhkd-volume.sh up
 
 XF86WWW
-	pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null && kill -42 $(pidof dwmblocks)
+	~/.config/scripts/sxhkd-volume.sh down

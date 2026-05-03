@@ -3,12 +3,10 @@
 
 case "$BLOCK_BUTTON" in
     1) playerctl play-pause ;;
-    2) playerctl next ;;
-    3) playerctl previous ;;
+    2) playerctl previous ;;
+    3) playerctl next ;;
     4) playerctl position 10- ;;
     5) playerctl position 10+ ;;
-    6) playerctl next ;;
-    7) playerctl previous ;;
 esac
 
 status="$(playerctl --no-messages status)" || exit 1

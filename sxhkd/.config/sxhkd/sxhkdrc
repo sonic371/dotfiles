@@ -34,21 +34,15 @@ super + d
 super + w
 	~/.config/scripts/record-webcam.sh
 
-# Thinkpad media keys (all mapped to redshift-toggle)
-XF86Display
-	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+super + y
+	~/.config/scripts/dmenu_media.sh
 
-#XF86Messenger
-#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
-#
-#XF86Go
-#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
-#
-#Cancel
-#	/home/wade/.local/bin/tool-redshift-toggle >/dev/null 2>&1
+# Thinkpad media keys
+XF86Display
+	~/.local/bin/tool-redshift-toggle >/dev/null 2>&1
 
 XF86Favorites
-	/home/wade/.local/bin/tool-middle-buttom-toggle
+	~/.local/bin/tool-middle-buttom-toggle >/dev/null 2>&1
 
 # Model B1: Click navigation
 XF86AudioPrev

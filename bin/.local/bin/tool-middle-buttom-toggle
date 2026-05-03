@@ -1,11 +1,26 @@
 #!/bin/sh
-STATE_FILE="/tmp/trackpoint_scrolling_state"
 
-# Toggle between button 0 and 2 for middle button scrolling
-if [ -f "$STATE_FILE" ] && [ "$(cat "$STATE_FILE")" = "on" ]; then
-    xinput set-prop "TPPS/2 Synaptics TrackPoint" "libinput Button Scrolling Button" 0
-    echo "off" > "$STATE_FILE"
+DEVICE="TPPS/2 Synaptics TrackPoint"
+
+# Check if device exists
+if ! xinput list --name-only | grep -q "$DEVICE"; then
+    notify-send -u critical "TrackPoint Error" "TrackPoint device not found"
+    echo "Error: TrackPoint device not found"
+    exit 1
+fi
+
+# Get current button scrolling setting
+CURRENT_BUTTON=$(xinput list-props "$DEVICE" | grep "libinput Button Scrolling Button" | grep -oP '\d+$' | head -1)
+
+# Toggle based on current state
+if [ "$CURRENT_BUTTON" = "2" ]; then
+    # Currently on (button 2) - switch to off
+    xinput set-prop "$DEVICE" "libinput Button Scrolling Button" 0
+    notify-send -t 2000 "TrackPoint Mode" "Middle button scrolling: OFF" -h string:hlcolor:#ff5555
+    echo "Middle button scrolling disabled"
 else
-    xinput set-prop "TPPS/2 Synaptics TrackPoint" "libinput Button Scrolling Button" 2
-    echo "on" > "$STATE_FILE"
+    # Currently off (button 0) - switch to on
+    xinput set-prop "$DEVICE" "libinput Button Scrolling Button" 2
+    notify-send -t 2000 "TrackPoint Mode" "Middle button scrolling: ON" -h string:hlcolor:#55ff55
+    echo "Middle button scrolling enabled"
 fi

@@ -60,6 +60,14 @@ dmenu uses "double-buffering" for reloads. It reads the new menu items into memo
 - **Index-Based**: dmenu remembers the index of your current selection. After a reload, it automatically highlights the same line, even if the text on that line has changed (e.g., volume percentage updates).
 - **View Locking**: If you have scrolled to a specific page in a long list, dmenu will stay on that page after a reload.
 - **Search Continuity**: Your current search/filter text is **not** cleared after a selection, allowing you to perform multiple actions within a filtered list without re-typing.
+- **Dynamic Window Resizing**: The menu window will automatically expand or shrink to match the number of items during a reload.
+- **Asynchronous Polling**: dmenu uses `select()` to watch `stdin` in the background. It can refresh its contents (like a live seek bar) even if you aren't moving the mouse or typing.
+- **Mouse Sync**: After a background refresh, dmenu immediately updates the selection to stay perfectly synchronized with your mouse cursor.
+- **Smart Separators**: Any menu item starting with the `━` character is treated as a visual separator. It is unselectable by both keyboard and mouse.
+- **Dual-Mode Stability**: The advanced background polling logic only activates when `-persist` is used. Standard dmenu usage (like `dmenu_run`) remains 100% original and stable.
 
 ### UI Colors
 The `SchemeOut` (selection marking) is disabled when `-persist` is active to keep the UI clean during long-running sessions.
+
+## Search Precision
+If you are building a music or file browser, you might want to use the **`-F`** flag. This disables "Fuzzy Matching" and switches to "Standard Matching," which is much more precise and prevents unrelated items from cluttering your results.

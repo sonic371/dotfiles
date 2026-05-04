@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Convert millidegrees to Celsius
+echo "=== Temperature Sensors ==="
+
+# CPU temps
+echo "CPU (ACPI): $(($(cat /sys/class/thermal/thermal_zone0/temp) / 1000))°C"
+echo "CPU (AMD): $(($(cat /sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon7/temp1_input 2>/dev/null) / 1000))°C"
+
+# ThinkPad sensors (skip missing temp2 and check for valid values)
+for i in 1 3 4 5 6 7 8; do
+    file="/sys/devices/platform/thinkpad_hwmon/hwmon/hwmon5/temp${i}_input"
+    if [ -f "$file" ]; then
+        temp=$(cat "$file" 2>/dev/null)
+        if [ "$temp" != "0" ] && [ -n "$temp" ]; then
+            echo "ThinkPad Sensor $i: $(($temp / 1000))°C"
+        fi
+    fi
+done
+
+# NVMe SSD
+nvme_temp=$(cat /sys/devices/pci0000:00/0000:00:02.4/0000:02:00.0/nvme/nvme0/hwmon4/temp1_input 2>/dev/null)
+if [ -n "$nvme_temp" ]; then
+    echo "NVMe SSD: $(($nvme_temp / 1000))°C"
+fi
+
+# WiFi
+wifi_temp=$(cat /sys/devices/pci0000:00/0000:00:02.2/0000:01:00.0/ieee80211/phy0/hwmon9/temp1_input 2>/dev/null)
+if [ -n "$wifi_temp" ]; then
+    echo "WiFi: $(($wifi_temp / 1000))°C"
+fi

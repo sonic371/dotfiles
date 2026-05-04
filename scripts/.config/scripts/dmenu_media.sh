@@ -1,138 +1,173 @@
 #!/bin/bash
 
 # ============================================
-# MPV Media Controller with dmenu (DYNAMIC)
-# Uses direct IPC socket to mpv
+# MPV Media Controller (ELITE HUD VERSION)
 # ============================================
 
-# ============================================
-# CONFIGURATION SECTION
-# ============================================
-
-# Socket configuration
+# CONFIGURATION
 SOCKET="/tmp/mpv-socket"
 SOCAT_CMD="socat"
-
-# Music directory
-MUSIC_DIR="/home/wade/Videos/Music"
-
-# FIFO files for dmenu communication
 FIFO_IN="/tmp/dmenu-media-in"
 FIFO_OUT="/tmp/dmenu-media-out"
+MODE_FILE="/tmp/dmenu-media-mode"
+MUSIC_DIR="/home/wade/Videos/Music"
 
-# Dmenu appearance
+# Startup command (Wallpaper mode)
+MPV_CMD="xwinwrap -ni -nf -b -un -s -fs -ovr -d -- mpv -wid WID --input-ipc-server=$SOCKET --fs=yes --shuffle --loop-playlist=inf --osd-bar=no $MUSIC_DIR"
+
+# DMENU OPTIONS
 DMENU_OPTS=(
     -fn "Px437 DOS/V re. JPN30:size=18"
-    -nb "#000000"
-    -nf "#ffffff"
-    -sb "#ffffff"
-    -sf "#000000"
-    -l 25
-    -h 20
-    -persist
+    -nb "#000000" -nf "#ffffff" 
+    -sb "#ffffff" -sf "#000000"
+    -l 20 -h 25 -c -persist -i -F
 )
 
-NOTIFY_TIMEOUT=1500
-MAX_TITLE_LENGTH=60
+# Initialize State
+echo "CONTROLS" > "$MODE_FILE"
 
-# ============================================
-# FUNCTIONS
-# ============================================
+# Helper: Send IPC command (Output captured)
+ipc() { echo "$1" | $SOCAT_CMD - "$SOCKET" 2>/dev/null; }
 
-send_command() { echo "$1" | $SOCAT_CMD - "$SOCKET" 2>/dev/null; }
-send_json_command() { echo "$1" | $SOCAT_CMD - "$SOCKET" 2>/dev/null; }
+# Helper: Send IPC command (Output silenced)
+cmd() { ipc "$1" >/dev/null; }
 
-get_status() {
-    response=$(send_json_command '{ "command": ["get_property", "pause"] }')
-    [[ "$response" == *'"data":false'* ]] && echo "Playing" || echo "Paused"
+# Helper: Fetch MPV property (Robust)
+get_prop() { 
+    ipc "{ \"command\": [\"get_property\", \"$1\"] }" | sed -E 's/.*"data":("([^"]*)"|([^,}]*)).*/\2\3/'
 }
 
-get_song_title() {
-    response=$(send_json_command '{ "command": ["get_property", "media-title"] }')
-    title=$(echo "$response" | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
-    if [ -z "$title" ]; then
-        response=$(send_json_command '{ "command": ["get_property", "filename"] }')
-        title=$(echo "$response" | grep -o '"data":"[^"]*"' | cut -d'"' -f4 | sed 's/\.[^.]*$//')
-    fi
-    echo "$title"
+# Helper: Format seconds to MM:SS
+fmt_time() {
+    local sec=${1%.*}
+    [[ -z "$sec" || "$sec" == "null" ]] && echo "00:00" && return
+    printf "%02d:%02d" $((sec/60)) $((sec%60))
 }
 
-get_volume() {
-    response=$(send_json_command '{ "command": ["get_property", "volume"] }')
-    volume=$(echo "$response" | grep -o '"data":[0-9]*' | cut -d':' -f2)
-    echo "${volume:-0}"
-}
-
-is_mpv_running() { pgrep -x "mpv" > /dev/null; }
-
-truncate_text() {
-    local text="$1"
-    local max_len="$2"
-    ((${#text} > max_len)) && echo "${text:0:$((max_len-3))}..." || echo "$text"
+# Helper: Generate a progress bar [#######---]
+draw_bar() {
+    local val=${1%.*} # current value
+    local max=${2%.*} # max value
+    local width=$3    # character width
+    [[ -z "$max" || "$max" == "null" || "$max" == "0" ]] && max=100
+    (( val > max )) && val=$max
+    (( val < 0 )) && val=0
+    local filled=$(( val * width / max ))
+    local bar=""
+    for ((i=0; i<filled; i++)); do bar+="#"; done
+    for ((i=filled; i<width; i++)); do bar+="-"; done
+    echo "[$bar]"
 }
 
 show_menu() {
-    if ! is_mpv_running; then
-        echo "⚠️ MPV not running"
-        echo "━━━━━━━━━━━━━━━━━━"
-        echo "▶️ Start MPV"
-        echo "🚪 Exit"
+    # Heartbeat check
+    if ! ipc '{ "command": ["get_property", "pause"] }' | grep -q "data"; then
+        echo -e "⚠️ MPV Offline\n━━━━━━━━━━━━━━━━━━\n▶️ Start MPV\n🚪 Exit"
         return
     fi
     
-    status=$(get_status)
-    song=$(get_song_title)
-    volume=$(get_volume)
-    song=$(truncate_text "$song" "$MAX_TITLE_LENGTH")
+    local playing_idx=$(get_prop "playlist-pos")
+    local cur_mode=$(cat "$MODE_FILE")
+
+    # --------------------------------------------
+    # PLAYLIST BROWSER MODE
+    # --------------------------------------------
+    if [[ "$cur_mode" == "PLAYLIST" ]]; then
+        echo "📂 [Back to Controls]"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        ipc '{ "command": ["get_property", "playlist"] }' | \
+            grep -o '"filename":"[^"]*"' | cut -d'"' -f4 | \
+            sed 's/.*\///; s/\.[^.]*$//' | \
+            awk -v cur="$((playing_idx+1))" '{ printf "%s %02d: %s\n", (NR==cur ? "▶️" : "  "), NR, $0 }'
+        return
+    fi
+
+    # --------------------------------------------
+    # REMOTE CONTROL MODE (HUD)
+    # --------------------------------------------
+    local pause_state=$(get_prop "pause")
+    local icon=$([[ "$pause_state" == "false" ]] && echo "󰝚" || echo "")
+    local volume=$(get_prop "volume")
+    local song=$(get_prop "media-title")
+    [[ -z "$song" || "$song" == "null" ]] && song=$(get_prop "filename")
+    local pos=$(get_prop "time-pos")
+    local dur=$(get_prop "duration")
     
-    echo "🎵 $status: $song"
+    # Clean up song title
+    song=$(echo "$song" | sed 's/ #.*//; s/\.[^.]*$//')
+    
+    # Dynamic Volume Icon
+    local vol_int=${volume%.*}
+    local vol_icon=""
+    if [[ $vol_int -eq 0 ]]; then vol_icon="󰝟"
+    elif [[ $vol_int -lt 40 ]]; then vol_icon=""
+    elif [[ $vol_int -lt 70 ]]; then vol_icon=""
+    fi
+
+    # Output Menu
+    echo "$icon $song"
+    echo "🕒 $(fmt_time $pos) $(draw_bar $pos $dur 15) $(fmt_time $dur)"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "⏯️  Play/Pause"
-    echo "⏭️  Next Track"
-    echo "⏮️  Previous Track"
-    echo "⏹️  Stop"
+    echo -e "⏯️  Play/Pause\n⏭️  Next Track\n⏮️  Previous Track\n⏹️  Stop"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔊 Volume Up   +10%  (Current: ${volume}%)"
-    echo "🔉 Volume Down -10%  (Current: ${volume}%)"
-    echo "🔇 Mute/Unmute"
+    echo "$vol_icon $(draw_bar $vol_int 100 10) $vol_int%"
+    echo -e "➕ Volume Up\n➖ Volume Down\n🔇 Mute/Unmute"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔄 Shuffle Toggle"
-    echo "🔁 Loop Playlist"
-    echo "🔂 Loop Single File"
+    echo -e "⏩ Seek +30s\n⏪ Seek -30s\n⏫ Seek +5m\n⏬ Seek -5m"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "⏩ Seek +30 seconds"
-    echo "⏪ Seek -30 seconds"
-    echo "⏫ Seek +5 minutes"
-    echo "⏬ Seek -5 minutes"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📋 Current Track Info"
-    echo "📊 Playlist Status"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🎯 Play Music Directory"
-    echo "🔄 Restart MPV"
-    echo "🚪 Exit"
+    echo -e "🔍 Browse Playlist\n🚪 Exit"
 }
 
 execute_command() {
     case "$1" in
-        "⏯️  Play/Pause") send_command "cycle pause" ;;
-        "⏭️  Next Track") send_command "playlist-next" ;;
-        "⏮️  Previous Track") send_command "playlist-prev" ;;
-        "⏹️  Stop") send_command "stop" ;;
-        "🔊 Volume Up"*) send_command "add volume 10" ;;
-        "🔉 Volume Down"*) send_command "add volume -10" ;;
-        "🔇 Mute/Unmute") send_command "cycle mute" ;;
-        "🔄 Shuffle Toggle") send_command "cycle shuffle" ;;
-        "🔁 Loop Playlist") send_command "set loop-playlist inf" ;;
-        "🔂 Loop Single File") send_command "set loop-file inf" ;;
-        "⏩ Seek +30 seconds") send_command "seek 30" ;;
-        "⏪ Seek -30 seconds") send_command "seek -30" ;;
-        "⏫ Seek +5 minutes") send_command "seek 300" ;;
-        "⏬ Seek -5 minutes") send_command "seek -300" ;;
-        "🎯 Play Music Directory") mpv --shuffle --loop-playlist=inf --no-video --input-ipc-server="$SOCKET" "$MUSIC_DIR" & ;;
-        "🔄 Restart MPV"*) pkill mpv; sleep 0.5; mpv --shuffle --loop-playlist=inf --no-video --input-ipc-server="$SOCKET" "$MUSIC_DIR" & ;;
-        "▶️ Start MPV") mpv --shuffle --loop-playlist=inf --no-video --input-ipc-server="$SOCKET" "$MUSIC_DIR" & ;;
-        "🚪 Exit") exit 0 ;;
+        # Navigation
+        "📂 "*) echo "CONTROLS" > "$MODE_FILE" ;;
+        "🔍 "*) echo "PLAYLIST" > "$MODE_FILE" ;;
+        
+        # Seek Bar (Match by emoji, explicitly ignore)
+        "🕒 "*) return ;;
+
+        # Playlist Selection (Any line containing "digits:")
+        *[0-9]*:*) 
+            local idx=$(echo "$1" | grep -o "[0-9]*:" | head -n1 | tr -d ':')
+            idx=$(( 10#$idx - 1 ))
+            cmd "{ \"command\": [\"playlist-play-index\", $idx] }"
+            echo "CONTROLS" > "$MODE_FILE" ;;
+
+        # Title Info
+        "󰝚 "*|" "*) 
+            local full_title=$(get_prop 'media-title' | sed 's/ #.*//')
+            local vol=$(get_prop 'volume')
+            local info="Track: $full_title\nVol: ${vol%.*}%\nPlaylist: $(( $(get_prop 'playlist-pos') + 1 )) of $(get_prop 'playlist-count')"
+            notify-send -t 2000 "MPV Media Center" "$info" ;;
+
+        # Playback
+        "⏯️  "*) cmd "cycle pause" ;;
+        "⏭️  "*) cmd "playlist-next" ;;
+        "⏮️  "*) cmd "playlist-prev" ;;
+        "⏹️  "*) cmd "stop" ;;
+
+        # Volume
+        "➕ "*)  cmd "add volume 10" ;;
+        "➖ "*)  cmd "add volume -10" ;;
+        "🔇 "*)  cmd "cycle mute" ;;
+
+        # Seeking
+        "⏩ "*)  cmd "seek 30" ;;
+        "⏪ "*)  cmd "seek -30" ;;
+        "⏫ "*)  cmd "seek 300" ;;
+        "⏬ "*)  cmd "seek -300" ;;
+
+        # System
+        "▶️ "*)
+            eval "$MPV_CMD" &
+            for i in {1..50}; do
+                if ipc '{ "command": ["get_property", "pause"] }' | grep -q "data"; then break; fi
+                sleep 0.1
+            done
+            ;;
+        "🚪 "*) exit 0 ;;
     esac
 }
 
@@ -145,32 +180,39 @@ execute_command() {
 [[ -p "$FIFO_OUT" ]] || mkfifo "$FIFO_OUT"
 
 # Start dmenu in the background
-./dmenu "${DMENU_OPTS[@]}" < "$FIFO_IN" > "$FIFO_OUT" &
+dmenu "${DMENU_OPTS[@]}" < "$FIFO_IN" > "$FIFO_OUT" &
 DMENU_PID=$!
 
-# Cleanup on exit
-trap "kill $DMENU_PID 2>/dev/null; rm -f $FIFO_IN $FIFO_OUT; exit" EXIT
-
-# Open FIFO_IN for writing and keep it open
+# Open FIFOs and keep them open (Permanent Connection)
 exec 3> "$FIFO_IN"
+exec 4< "$FIFO_OUT"
 
-# 1. Send initial menu
+# BACKGROUND TICKER (Inherits FD 3)
+(
+  while true; do
+    sleep 1
+    if [[ "$(cat "$MODE_FILE")" == "CONTROLS" ]]; then
+        if ipc '{ "command": ["get_property", "pause"] }' | grep -q "data"; then
+            show_menu >&3
+            printf "\1\n" >&3
+        fi
+    fi
+  done
+) 2>/dev/null & # Silence background errors if dmenu closes
+TICKER_PID=$!
+
+# Cleanup on exit
+trap "kill $DMENU_PID $TICKER_PID 2>/dev/null; rm -f $FIFO_IN $FIFO_OUT $MODE_FILE; exit" EXIT
+
+# Initial menu
 show_menu >&3
 printf "\1\n" >&3
 
-# Controller Loop
-while true; do
-    # 2. Wait for user selection from dmenu
-    if read -r selection < "$FIFO_OUT"; then
-        # 3. Execute command
-        execute_command "$selection"
-        # 4. Small sleep to let MPV update its state
-        sleep 0.1
-        # 5. Send UPDATED menu to dmenu
-        show_menu >&3
-        printf "\1\n" >&3
-    else
-        # dmenu was closed (Escape)
-        break
-    fi
+# Controller Loop (Uses permanent FD 4)
+while read -r selection <&4; do
+    execute_command "$selection"
+    # Small sleep to let MPV process state
+    sleep 0.1
+    show_menu >&3
+    printf "\1\n" >&3
 done

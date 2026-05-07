@@ -37,6 +37,9 @@ super + w
 super + y
 	~/.config/scripts/dmenu_media.sh
 
+super + r
+	~/.config/scripts/sxhkd_record.sh
+
 # Thinkpad media keys
 XF86Display
 	~/.local/bin/tool-redshift-toggle >/dev/null 2>&1

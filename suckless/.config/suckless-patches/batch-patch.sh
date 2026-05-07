@@ -2,7 +2,7 @@
 # Apply all .diff patches 
 # Simple: patch < A.diff patch < B.diff patch < C.diff
 
-for patch in *.diff; do
+for patch in *.diff *.patch; do
     [ -f "$patch" ] || continue
     echo "applying $patch"
     patch < "$patch"

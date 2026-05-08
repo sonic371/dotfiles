@@ -81,16 +81,9 @@ return {
     sort_by = "modified",
     sort_reversed = true,
 
-    -- UI settings (already enabled by default, but nice to have listed).
+    -- UI settings (disabled because we are using render-markdown.nvim).
     ui = {
-      enable = true,
-      update_debounce = 200,
-      max_file_length = 5000,
-      checkboxes = {
-        [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
-        ["x"] = { char = "", hl_group = "ObsidianDone" },
-      },
-      bullets = { char = "•", hl_group = "ObsidianBullet" },
+      enable = false,
     },
   },
 }

@@ -24,6 +24,17 @@ notify() {
     fi
 }
 
+# Get default system audio monitor (for capturing playback)
+get_default_monitor() {
+    local default_sink=$(pactl get-default-sink)
+    echo "${default_sink}.monitor"
+}
+
+# Get default microphone source
+get_default_mic() {
+    pactl get-default-source
+}
+
 # Check if recording is already running
 is_recording() {
     [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
@@ -70,12 +81,33 @@ cleanup_recording() {
     exit 0
 }
 
+# Show current audio configuration (for debugging)
+show_audio_config() {
+    local default_sink=$(pactl get-default-sink)
+    local default_mic=$(pactl get-default-source)
+    local monitor="${default_sink}.monitor"
+    
+    echo "Default Sink (speaker/headphones): $default_sink"
+    echo "Monitor source (system audio): $monitor"
+    echo "Default Mic source: $default_mic"
+    
+    notify "Audio Configuration" "normal" 3000
+}
+
 # Start a new recording
 start_recording() {
     cd "$RECORDING_DIR" || {
         notify "Failed to access recording directory!" "critical"
         exit 1
     }
+    
+    # Get current audio sources
+    SYSTEM_AUDIO=$(get_default_monitor)
+    MIC_SOURCE=$(get_default_mic)
+    
+    # Show which sources are being used
+    notify "🎤 Mic: $(basename "$MIC_SOURCE" | cut -d'.' -f1 | cut -c1-30)" "normal" 2000
+    notify "🔊 System: $(basename "$SYSTEM_AUDIO" | cut -d'.' -f1 | cut -c1-30)" "normal" 2000
     
     TIMESTAMP=$(date +%Y%m%d_%H%M%S)
     SCREEN_FILE="screen_${TIMESTAMP}.mp4"
@@ -91,11 +123,11 @@ start_recording() {
     # Set up trap for cleanup
     trap cleanup_recording SIGINT SIGTERM
     
-    # Record screen with audio
+    # Record screen with audio (using default sources)
     ffmpeg -video_size 1920x1200 -framerate 30 \
       -f x11grab -i :0.0 \
-      -f pulse -i alsa_output.pci-0000_c3_00.6.HiFi__Speaker__sink.monitor \
-      -f pulse -i alsa_input.usb-YUKUI_YUKUI_D80_0000KT4c020000001-00.analog-stereo \
+      -f pulse -i "$SYSTEM_AUDIO" \
+      -f pulse -i "$MIC_SOURCE" \
       -filter_complex "[1:a][2:a]amix=inputs=2:duration=longest[a]" \
       -map 0:v -map "[a]" \
       -c:v libx264 -preset veryfast -crf 23 \
@@ -141,6 +173,11 @@ stop_recording() {
 }
 
 # Main toggle logic
+if [ "$1" = "--show-config" ]; then
+    show_audio_config
+    exit 0
+fi
+
 if is_recording; then
     stop_recording
 else

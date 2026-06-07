@@ -53,6 +53,9 @@ unclutter -idle "$UNCLUTTER_IDLE" &
 # Cloud sync
 mega-sync >/dev/null 2>&1 &
 
+# Start the file portal for LibreWolf/Firefox
+/usr/lib/xdg-desktop-portal-gtk &
+
 # === POWER MANAGEMENT ===
 # Screen saver and DPMS
 xset s "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"

@@ -83,3 +83,4 @@ batchcomp() {
         comp "$file"
     done
 }
+

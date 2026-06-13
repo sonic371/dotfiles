@@ -1,4 +1,4 @@
-ZSH_THEME="simple" # set by `omz`
+#ZSH_THEME="simple" # set by `omz`
 
 #!/usr/bin/env zsh
 # Main ZSH configuration file
@@ -26,3 +26,10 @@ for file in "${zsh_config_files[@]}"; do
     source "$HOME/.zsh/$file"
   fi
 done
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/wade/.local/bin:$PATH"
+
+# Added by LM Studio CLI tool (lms)
+export PATH="$PATH:/home/wade/.lmstudio/bin"

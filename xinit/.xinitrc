@@ -60,6 +60,7 @@ mega-sync >/dev/null 2>&1 &
 # Screen saver and DPMS
 xset s "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"
 xset dpms "$IDLE_TIMEOUT" "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"
+xset r rate 200 35
 
 # Idle manager with chained actions
 xidlehook \

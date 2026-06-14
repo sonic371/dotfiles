@@ -38,6 +38,8 @@ reload() {
 
 # vi mode with cursor shape changes 
 set -o vi
+bind -m vi-insert '"\C-l": clear-screen'
+bind -m vi-command '"\C-l": clear-screen'
 
 # Bash cursor shape changes are trickier than ZLE.
 # Usually done via PS1 or custom bindings if the terminal supports it.

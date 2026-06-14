@@ -1,0 +1,14 @@
+# File listing aliases
+alias ls='eza'
+alias lt='eza --all --long  --tree --level 3 --group-directories-first'
+alias lts='eza --all --long  --tree --level 3 --group-directories-first --total-size'
+
+# Dotfiles navigation
+alias dot='cd ~/dotfiles'
+alias dots='cd ~/dotfiles && git status'
+
+# Neovim
+alias v='nvim'
+
+# Rebuild
+alias rebuild='git clean -fd && sudo make clean install'

@@ -7,13 +7,22 @@
 # HISTORY CONFIGURATION
 # ----------------------------------------------------------------------------
 HISTFILE=~/.bash_history
-HISTSIZE=10000
-HISTFILESIZE=10000
+HISTSIZE=100000
+HISTFILESIZE=100000
 
 # Bash history options
 shopt -s histappend             # Append to history instead of overwriting
 export HISTCONTROL=ignoredups:erasedups # Don't save duplicate commands
 export HISTTIMEFORMAT="%F %T "  # Save timestamps
+
+# Real-time history sync between terminals:
+# history -a writes each command immediately (not just at shell exit).
+# PROMPT_COMMAND reads new entries from other shells at each prompt.
+_history_sync() {
+    history -a  # Append current session's new lines to HISTFILE
+    history -n  # Read new lines from HISTFILE written by other sessions
+}
+[[ "${PROMPT_COMMAND}" =~ _history_sync ]] || PROMPT_COMMAND="_history_sync${PROMPT_COMMAND:+; }${PROMPT_COMMAND}"
 
 # ----------------------------------------------------------------------------
 # INTERACTIVE SHELL BEHAVIOR

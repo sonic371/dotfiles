@@ -8,11 +8,14 @@
 # A list of configuration files to source, in order.
 bash_config_files=(
   env.bash
+  paths.bash
   fzf-integration.bash
   zoxide-integration.bash
   aliases.bash
   functions.bash
   options.bash
+  vi-mode.bash
+  prompt.bash
   dotfiles.bash
   ssh.bash
 )
@@ -28,8 +31,3 @@ for file in "${bash_config_files[@]}"; do
   fi
 done
 
-# Added by Antigravity CLI installer
-export PATH="/home/wade/.local/bin:$PATH"
-
-# Added by LM Studio CLI tool (lms)
-export PATH="$PATH:/home/wade/.lmstudio/bin"

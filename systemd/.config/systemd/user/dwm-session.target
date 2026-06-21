@@ -2,4 +2,3 @@
 Description=DWM Graphical Session
 BindsTo=graphical-session.target
 Before=graphical-session.target
-Wants=graphical-session.target

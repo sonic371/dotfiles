@@ -1,18 +1,19 @@
 #!/bin/sh
 
+# Ensure XDG_RUNTIME_DIR is set for systemctl --user
+[ -z "$XDG_RUNTIME_DIR" ] && export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+
 # === CONFIGURATION ===
 IDLE_TIMEOUT=2100      # 35 minutes
 LOCK_TIMEOUT=600       # 10 minutes
 UNCLUTTER_IDLE=3
 
 # === HARDWARE & SYSTEM SETUP ===
-# Input devices
+# Input devices — configured via /etc/X11/xorg.conf.d/40-touchpad.conf
 # setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
-~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1 || echo "Warning: touchpad-setup.sh failed"
 
-# Display setup (critical for everything visual)
-autorandr -c 2>/dev/null
-~/.config/scripts/wallpaper.sh || echo "Warning: wallpaper.sh failed"
+# Display setup
+autorandr -c || echo "Warning: autorandr failed to apply display config" 2>/dev/null
 
 # X resources
 xrdb -merge ~/.Xresources 2>/dev/null
@@ -21,7 +22,7 @@ xrdb -merge ~/.Xresources 2>/dev/null
 xset -b
 
 # Initialize state files
-echo "off" > /tmp/i3blocks_redshift_state
+echo "off" > /tmp/redshift_state
 
 # === POWER MANAGEMENT ===
 # Screen saver and DPMS

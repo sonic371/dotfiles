@@ -1,8 +1,13 @@
 [Unit]
 Description=Change Wallpaper
+After=graphical-session.target
+PartOf=graphical-session.target
 
 [Service]
 Type=oneshot
 Environment="DISPLAY=:0"
 Environment="XAUTHORITY=%h/.Xauthority"
 ExecStart=%h/.config/scripts/wallpaper.sh
+
+[Install]
+WantedBy=graphical-session.target

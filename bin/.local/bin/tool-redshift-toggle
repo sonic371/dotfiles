@@ -1,6 +1,6 @@
 #!/bin/sh
-REDSHIFT_STATE_FILE="/tmp/i3blocks_redshift_state"
-REDSHIFT_PID_FILE="/tmp/i3blocks_redshift_pid"
+REDSHIFT_STATE_FILE="/tmp/redshift_state"
+REDSHIFT_PID_FILE="/tmp/redshift_pid"
 
 if ! command -v redshift >/dev/null 2>&1; then
 	echo "Redshift: NOT INSTALLED"

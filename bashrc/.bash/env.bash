@@ -6,15 +6,11 @@
 # Editor and terminal
 export EDITOR=nvim
 export TERMINAL=st
+export MANPAGER="bat -l man -p"
 
 # Application-specific paths
 export _ZO_DATA_DIR="$HOME/.local/share/zoxide"
 export PROTONPATH="/usr/share/steam/compatibilitytools.d/proton-ge-custom"
-
-# Input method (fcitx5)
-export GTK_IM_MODULE=fcitx5
-export QT_IM_MODULE=fcitx5
-export XMODIFIERS=@im=fcitx5
 
 # PATH modifications
 export PATH="$HOME/.local/bin:$PATH"

@@ -1,0 +1,12 @@
+[Unit]
+Description=Picom Compositor
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/picom
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=graphical-session.target

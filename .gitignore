@@ -5,3 +5,5 @@ applications/.local/share/applications/brave-egmafekfmcnknbdlbfbhafbllplmjlhn-De
 bin/.local/bin/agy
 bin/.local/bin/swival
 bin/.local/bin/obsidian
+agy*
+*.wants/

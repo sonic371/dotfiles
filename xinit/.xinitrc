@@ -5,15 +5,9 @@ IDLE_TIMEOUT=2100      # 35 minutes
 LOCK_TIMEOUT=600       # 10 minutes
 UNCLUTTER_IDLE=3
 
-# === KILL EXISTING INSTANCES ===
-echo "Cleaning up existing processes..."
-for p in dunst picom dwmblocks dwmblocks-musicup unclutter fcitx5 mega-sync xidlehook sxhkd; do
-    killall -q "$p" 2>/dev/null
-done
-
 # === HARDWARE & SYSTEM SETUP ===
 # Input devices
-setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
+# setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
 ~/.config/scripts/touchpad-setup.sh >/dev/null 2>&1 || echo "Warning: touchpad-setup.sh failed"
 
 # Display setup (critical for everything visual)
@@ -29,46 +23,34 @@ xset -b
 # Initialize state files
 echo "off" > /tmp/i3blocks_redshift_state
 
-# === START DAEMONS & SERVICES ===
-# Notification daemon (needed early for other services)
-dunst &
-
-# Compositor (needed for transparency, etc.)
-picom &
-
-# Hotkey daemon
-(setsid env PATH="$HOME/.local/bin:$PATH" sxhkd 2>/tmp/sxhkd.log) &
-
-# Input method framework
-fcitx5 -d >/dev/null 2>&1 &
-
-# === START UTILITIES ===
-# Status bars
-dwmblocks &
-dwmblocks-musicup &
-
-# Auto-idle cursor hider
-unclutter -idle "$UNCLUTTER_IDLE" &
-
-# Cloud sync
-mega-sync >/dev/null 2>&1 &
-
-# Start the file portal for LibreWolf/Firefox
-/usr/lib/xdg-desktop-portal-gtk &
-
 # === POWER MANAGEMENT ===
 # Screen saver and DPMS
 xset s "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"
 xset dpms "$IDLE_TIMEOUT" "$IDLE_TIMEOUT" "$IDLE_TIMEOUT"
 xset r rate 200 35
 
-# Idle manager with chained actions
-xidlehook \
-    --not-when-audio \
-    --timer "$IDLE_TIMEOUT" 'i3lock --nofork -c 000000' '' \
-    --timer "$IDLE_TIMEOUT" 'systemctl suspend' '' \
-    --timer 600 'xset dpms force off' '' \
-    &
+# === ENVIRONMENT VARIABLES ===
+# Input method (fcitx5)
+export GTK_IM_MODULE=fcitx5
+export QT_IM_MODULE=fcitx5
+export XMODIFIERS=@im=fcitx5
+
+# === SYSTEMD USER SESSION SETUP ===
+# Import environment variables into systemd user session
+systemctl --user import-environment DISPLAY XAUTHORITY PATH GTK_IM_MODULE QT_IM_MODULE XMODIFIERS
+
+# Setup cleanup trap to stop the graphical session on exit or termination
+cleanup() {
+    systemctl --user stop graphical-session.target
+}
+trap cleanup EXIT INT TERM HUP
+
+# Clear any failed states from the previous session
+systemctl --user reset-failed
+
+# Start the systemd user graphical session target
+systemctl --user start dwm-session.target
 
 # === START WINDOW MANAGER ===
-exec dwm
+# Run dwm (without exec so we can clean up on exit)
+dwm

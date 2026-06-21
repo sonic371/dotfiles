@@ -24,7 +24,7 @@ XF86AudioMicMute
 	~/.config/scripts/sxhkd-maim.sh >/dev/null 2>&1
 
 # Dmenu
-super + space
+alt + backslash
 	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
 
 # Exec define script

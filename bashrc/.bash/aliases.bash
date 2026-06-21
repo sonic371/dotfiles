@@ -1,4 +1,5 @@
 # File listing aliases
+alias l='eza -1a'
 alias ls='eza'
 alias lt='eza --all --long  --tree --level 3 --group-directories-first'
 alias lts='eza --all --long  --tree --level 3 --group-directories-first --total-size'

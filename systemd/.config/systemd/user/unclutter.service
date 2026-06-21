@@ -1,0 +1,12 @@
+[Unit]
+Description=Auto-idle cursor hider
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/unclutter -idle 3
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=graphical-session.target

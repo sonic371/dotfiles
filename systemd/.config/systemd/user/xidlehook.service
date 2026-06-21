@@ -1,0 +1,16 @@
+[Unit]
+Description=xidlehook idle manager
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/xidlehook \
+    --not-when-audio \
+    --timer 2100 'i3lock --nofork -c 000000' '' \
+    --timer 2100 'systemctl suspend' '' \
+    --timer 600 'xset dpms force off' ''
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=graphical-session.target

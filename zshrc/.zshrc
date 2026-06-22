@@ -1,5 +1,3 @@
-#ZSH_THEME="simple" # set by `omz`
-
 #!/usr/bin/env zsh
 # Main ZSH configuration file
 # Sources all modular configuration files from ~/.zsh/
@@ -11,7 +9,6 @@
 zsh_config_files=(
   env.zsh
   paths.zsh
-  oh-my-zsh.zsh
   fzf-integration.zsh
   zoxide-integration.zsh
   aliases.zsh
@@ -21,6 +18,7 @@ zsh_config_files=(
   prompt.zsh
   dotfiles.zsh
   ssh.zsh
+  plugins.zsh
 )
 
 # Source each configuration file if it exists.

@@ -7,3 +7,9 @@
 [submodule "dwmblocks-async/.local/src/dwmblocks-async"]
 	path = dwmblocks-async/.local/src/dwmblocks-async
 	url = https://github.com/UtkarshVerma/dwmblocks-async.git
+[submodule "zshrc/plugins/zsh-autosuggestions"]
+	path = zshrc/plugins/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
+[submodule "zshrc/plugins/zsh-syntax-highlighting"]
+	path = zshrc/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git

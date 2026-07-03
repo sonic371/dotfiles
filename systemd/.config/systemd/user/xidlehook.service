@@ -6,7 +6,7 @@ After=graphical-session.target
 [Service]
 ExecStart=/usr/bin/xidlehook \
     --not-when-audio \
-    --timer 2100 'i3lock --nofork -c 000000' '' \
+    --timer 2100 '%h/.config/scripts/i3lock-color.sh' '' \
     --timer 2100 'systemctl suspend' '' \
     --timer 600 'xset dpms force off' ''
 Restart=on-failure

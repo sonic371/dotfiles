@@ -4,8 +4,9 @@ PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
+Type=oneshot
 ExecStart=/usr/bin/mega-sync
-Restart=on-failure
+RemainAfterExit=yes
 
 [Install]
 WantedBy=graphical-session.target

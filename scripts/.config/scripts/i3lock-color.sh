@@ -1,0 +1,25 @@
+#!/bin/bash
+i3lock \
+  --blur=5 \
+  --clock \
+  --indicator \
+  --time-str="%H:%M:%S" \
+  --date-str="%A, %B %d" \
+  --time-color="#ffffff" \
+  --date-color="#ffffffb0" \
+  --ring-color="#ffffff20" \
+  --ringver-color="#7ec8e3c0" \
+  --inside-color="#ffffff10" \
+  --insidever-color="#ffffff10" \
+  --ringwrong-color="#ff6b6b80" \
+  --insidewrong-color="#ffffff10" \
+  --radius=120 \
+  --ring-width=10 \
+  --keyhl-color="#7ec8e3" \
+  --bshl-color="#ff6b6b" \
+  --separator-color="#ffffff20" \
+  --line-color="#ffffff10" \
+  --verif-color="#ffffff" \
+  --wrong-color="#ff6b6b" \
+  --noinput-text="No Input" \
+  --verif-text="Verifying..."

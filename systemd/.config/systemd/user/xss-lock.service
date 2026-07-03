@@ -1,0 +1,12 @@
+[Unit]
+Description=XSS lock daemon — lock screen on suspend/lid-close
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/xss-lock --transfer-sleep-lock --session=1 -- %h/.config/scripts/i3lock-color.sh
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=graphical-session.target

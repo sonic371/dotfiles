@@ -27,12 +27,17 @@ shift + @Print
 	~/.config/scripts/sxhkd-maim_fullscreen.sh >/dev/null 2>&1
 
 # Dmenu
-alt + backslash
+super + d
 	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
 
 # Exec define script
-super + d
-	~/.config/scripts/dmenu_define.sh
+#super + s
+#	~/.config/scripts/dmenu_define.sh
+super + q
+    xdotool getactivewindow windowkill
+
+super + Return
+    st
 
 super + w
 	~/.config/scripts/record-webcam.sh
@@ -41,7 +46,13 @@ super + y
 	~/.config/scripts/dmenu_media.sh
 
 super + r
-	~/.config/scripts/sxhkd_record.sh
+	~/.config/scripts/sxhkd_symbol.sh
+
+super + v
+	~/.config/scripts/sxhkd-toggle-rotate.sh
+
+super + button1_up
+        ~/.config/scripts/sxhkd_sync_symbol.sh
 
 # Thinkpad media keys
 XF86Display

@@ -1,0 +1,289 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "rich>=13.0.0",
+# ]
+# ///
+"""
+Antigravity Screen & Webcam Recorder (GPU Accelerated)
+======================================================
+Uses `gpu-screen-recorder` to achieve 100% zero-copy, GPU-native capture of screen
+and webcam overlay at 60+ FPS with hardware VAAPI H.264/HEVC encoding and zero lag.
+"""
+
+import os
+import sys
+import re
+import signal
+import subprocess
+import time
+from datetime import datetime
+import argparse
+import shutil
+from rich.console import Console
+from rich.panel import Panel
+from rich.live import Live
+from rich.text import Text
+from rich.table import Table
+
+console = Console()
+
+
+def check_gsr():
+    """Verify that gpu-screen-recorder is installed."""
+    if not shutil.which("gpu-screen-recorder"):
+        console.print("[bold red]Error: gpu-screen-recorder is not installed.[/bold red]")
+        console.print("Install it with: sudo pacman -S gpu-screen-recorder")
+        sys.exit(1)
+
+
+def get_default_audio_devices():
+    """Return PipeWire default input (microphone) and default output (system audio)."""
+    return "default_input", "default_output"
+
+
+def generate_dashboard(stats, config, recording=True, error_msg=None):
+    """Render the dashboard UI using Rich."""
+    status_text = Text()
+    if recording:
+        dot_color = "red" if int(time.time() * 2) % 2 == 0 else "black"
+        status_text.append("● ", style=dot_color)
+        status_text.append("RECORDING (GPU ACCELERATED)", style="bold red")
+    else:
+        status_text.append("■ ", style="bold green")
+        status_text.append("STOPPED / SAVED", style="bold green")
+
+    body = Table.grid(expand=True)
+    body.add_column()
+    body.add_row(Panel(status_text, expand=False, border_style="bold red" if recording else "bold green"))
+
+    sub_grid = Table.grid(expand=True, padding=(0, 2))
+    sub_grid.add_column(ratio=1)
+    sub_grid.add_column(ratio=1)
+
+    stats_table = Table(title="Live Stats", show_header=True, header_style="bold magenta", expand=True)
+    stats_table.add_column("Metric", style="dim")
+    stats_table.add_column("Value", style="bold cyan")
+    stats_table.add_row("Duration", stats.get("time", "00:00:00.00"))
+    stats_table.add_row("File Size", stats.get("size", "0 B"))
+    stats_table.add_row("FPS", stats.get("fps", "30.0"))
+    stats_table.add_row("Engine", "GPU Screen Recorder (VAAPI)")
+
+    config_table = Table(title="Devices & Config", show_header=True, header_style="bold green", expand=True)
+    config_table.add_column("Option", style="dim")
+    config_table.add_column("Value", style="yellow")
+
+    out_file = config.get("output_file", "")
+    if len(out_file) > 35:
+        out_file = "..." + out_file[-32:]
+    config_table.add_row("Output", out_file)
+    config_table.add_row("FPS Target", f"{config.get('fps')} fps")
+    config_table.add_row("Quality", config.get("quality", "very_high"))
+
+    if config.get("use_webcam"):
+        config_table.add_row("Webcam", f"{config.get('webcam_dev')}")
+        config_table.add_row("PiP Position", f"{config.get('pip_position')} ({int(config.get('pip_scale')*100)}%)")
+    else:
+        config_table.add_row("Webcam", "[dim]Disabled[/dim]")
+
+    if config.get("use_mic"):
+        mic = config.get("mic_dev", "default_input")
+        if len(mic) > 25: mic = "..." + mic[-22:]
+        config_table.add_row("Microphone", mic)
+    else:
+        config_table.add_row("Microphone", "[dim]Disabled[/dim]")
+
+    if config.get("use_sys_audio"):
+        sys_aud = config.get("sys_audio_dev", "default_output")
+        if len(sys_aud) > 25: sys_aud = "..." + sys_aud[-22:]
+        config_table.add_row("System Audio", sys_aud)
+    else:
+        config_table.add_row("System Audio", "[dim]Disabled[/dim]")
+
+    sub_grid.add_row(stats_table, config_table)
+    body.add_row(sub_grid)
+
+    if recording:
+        body.add_row(Text("\n[Ctrl+C] to stop recording safely.", style="bold yellow justify-center", justify="center"))
+
+    if error_msg:
+        body.add_row(Text(""))
+        body.add_row(Panel(f"[bold red]Log Summary:[/bold red]\n{error_msg}", title="Error Log", border_style="bold red"))
+
+    return Panel(body, title="[bold cyan]Antigravity GPU Recorder[/bold cyan]", border_style="cyan")
+
+
+def main():
+    check_gsr()
+
+    default_mic, default_sys_audio = get_default_audio_devices()
+
+    parser = argparse.ArgumentParser(
+        description="Antigravity GPU Screen and Webcam Recorder with zero lag.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    parser.add_argument("-o", "--output", help="Output file path (default: YYYY-MM-DD HH-MM-SS.mp4 in ~/Videos/Recordings)")
+    parser.add_argument("-w", "--webcam-device", default="/dev/video0", help="Webcam device path")
+    parser.add_argument("--no-webcam", action="store_true", help="Disable webcam Picture-in-Picture overlay")
+    parser.add_argument("-f", "--fps", type=int, default=30, help="Frame rate to record (30 or 60)")
+    parser.add_argument("-q", "--quality", choices=["ultra", "very_high", "high", "medium", "low"], default="very_high", help="Recording quality profile")
+    parser.add_argument("-k", "--codec", choices=["auto", "h264", "hevc", "av1"], default="h264", help="Video codec")
+
+    parser.add_argument("-m", "--mic-device", default=default_mic, help="Microphone audio device")
+    parser.add_argument("--no-mic", action="store_true", help="Disable microphone audio recording")
+    parser.add_argument("--no-system-audio", action="store_true", help="Disable system (desktop) audio recording")
+    parser.add_argument("-sa", "--system-audio-device", default=default_sys_audio, help="System output audio device")
+
+    parser.add_argument("-p", "--pip-position", choices=["bottom-right", "bottom-left", "top-right", "top-left"], default="bottom-left", help="Webcam overlay corner")
+    parser.add_argument("--pip-scale", type=float, default=0.20, help="Webcam overlay width scale relative to screen width (0.1 to 0.5)")
+
+    args = parser.parse_args()
+
+    # Setup Output File
+    if args.output:
+        output_file = os.path.abspath(args.output)
+    else:
+        recordings_dir = os.path.expanduser("~/Videos/Recordings")
+        os.makedirs(recordings_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+        output_file = os.path.join(recordings_dir, f"{timestamp}.mp4")
+
+    # Determine webcam usage
+    use_webcam = not args.no_webcam
+    webcam_dev = args.webcam_device
+    if use_webcam and not os.path.exists(webcam_dev):
+        console.print(f"[yellow]Warning: Webcam device {webcam_dev} not found. Disabling webcam overlay.[/yellow]")
+        use_webcam = False
+
+    # Position maps using official gpu-screen-recorder syntax
+    scale_pct = int(args.pip_scale * 100)
+    pos_map = {
+        "bottom-right": f"halign=end;valign=end;width={scale_pct}%;height={scale_pct}%;hflip=true",
+        "bottom-left":  f"halign=start;valign=end;width={scale_pct}%;height={scale_pct}%;hflip=true",
+        "top-right":    f"halign=end;valign=start;width={scale_pct}%;height={scale_pct}%;hflip=true",
+        "top-left":     f"halign=start;valign=start;width={scale_pct}%;height={scale_pct}%;hflip=true",
+    }
+
+    if use_webcam:
+        pip_opts = pos_map[args.pip_position]
+        capture_src = f"screen|{webcam_dev};{pip_opts}"
+    else:
+        capture_src = "screen"
+
+    # Audio inputs
+    audio_inputs = []
+    use_mic = not args.no_mic
+    use_sys_audio = not args.no_system_audio
+
+    if use_mic and args.mic_device:
+        audio_inputs.append(args.mic_device)
+    if use_sys_audio and args.system_audio_device:
+        audio_inputs.append(args.system_audio_device)
+
+    # Command construction
+    cmd = [
+        "gpu-screen-recorder",
+        "-w", capture_src,
+        "-f", str(args.fps),
+        "-q", args.quality,
+        "-k", args.codec,
+        "-o", output_file
+    ]
+
+    if audio_inputs:
+        cmd.extend(["-a", "|".join(audio_inputs)])
+
+    # Setup Logging
+    log_dir = os.path.expanduser("~/.cache/record")
+    os.makedirs(log_dir, exist_ok=True)
+    log_path = os.path.join(log_dir, "ffmpeg_latest.log")
+
+    config_info = {
+        "output_file": output_file,
+        "fps": args.fps,
+        "quality": args.quality,
+        "use_webcam": use_webcam,
+        "webcam_dev": webcam_dev,
+        "pip_position": args.pip_position,
+        "pip_scale": args.pip_scale,
+        "use_mic": use_mic,
+        "mic_dev": args.mic_device if use_mic else None,
+        "use_sys_audio": use_sys_audio,
+        "sys_audio_dev": args.system_audio_device if use_sys_audio else None
+    }
+
+    stats = {
+        "fps": str(args.fps),
+        "size": "0 B",
+        "time": "00:00:00.00"
+    }
+
+    log_file_handle = open(log_path, "w")
+    process = subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=log_file_handle,
+        stderr=log_file_handle,
+        text=True
+    )
+
+    start_time = time.time()
+
+    def stop_gsr():
+        if process.poll() is None:
+            try:
+                process.send_signal(signal.SIGINT)
+                process.wait(timeout=5)
+            except Exception:
+                try:
+                    process.kill()
+                    process.wait()
+                except Exception:
+                    pass
+
+    def cleanup_handler(sig, frame):
+        stop_gsr()
+
+    signal.signal(signal.SIGINT, cleanup_handler)
+    signal.signal(signal.SIGTERM, cleanup_handler)
+
+    try:
+        with Live(generate_dashboard(stats, config_info, recording=True), refresh_per_second=2, auto_refresh=True) as live:
+            while True:
+                if process.poll() is not None:
+                    break
+
+                elapsed = int(time.time() - start_time)
+                m, s = divmod(elapsed, 60)
+                h, m = divmod(m, 60)
+                stats["time"] = f"{h:02d}:{m:02d}:{s:02d}.00"
+
+                if os.path.exists(output_file):
+                    sz = os.path.getsize(output_file)
+                    if sz > 1024 * 1024:
+                        stats["size"] = f"{sz / (1024 * 1024):.2f} MB"
+                    elif sz > 1024:
+                        stats["size"] = f"{sz / 1024:.1f} KB"
+                    else:
+                        stats["size"] = f"{sz} B"
+
+                live.update(generate_dashboard(stats, config_info, recording=True))
+                time.sleep(0.5)
+
+    except Exception as e:
+        console.print(f"[bold red]Recorder error: {e}[/bold red]")
+    finally:
+        stop_gsr()
+        log_file_handle.close()
+
+        console.print(generate_dashboard(stats, config_info, recording=False))
+        if os.path.exists(output_file):
+            sz = os.path.getsize(output_file)
+            size_str = f"{sz / (1024*1024):.2f} MB" if sz > 1024*1024 else f"{sz / 1024:.1f} KB"
+            console.print(f"\n[bold green]✓ Recording saved successfully to:[/bold green] [yellow]{output_file}[/yellow] ({size_str})")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,2 @@
+#!/bin/bash
+xinput set-prop "ELAN06C2:00 04F3:3195 Touchpad" "Coordinate Transformation Matrix" 1 0 0 0 1 0 0 0 1

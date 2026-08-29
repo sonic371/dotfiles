@@ -28,3 +28,7 @@ for file in "${zsh_config_files[@]}"; do
   fi
 done
 
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/wade/.local/bin:$PATH"

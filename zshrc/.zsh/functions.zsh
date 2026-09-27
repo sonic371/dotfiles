@@ -57,3 +57,12 @@ batchcomp() {
     done
 }
 
+# Export aur diffs
+aurdiff() {
+  local d=~/pkgbuild-diffs
+  mkdir -p "$d"
+  for p in $(paru -Qua | awk '{print $1}'); do
+    [ -d ~/.cache/paru/clone/"$p" ] && git -C ~/.cache/paru/clone/"$p" log -p -1 > "$d/$p.diff"
+  done
+  ls -la "$d"
+}

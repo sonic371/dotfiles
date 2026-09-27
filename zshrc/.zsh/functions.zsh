@@ -59,10 +59,14 @@ batchcomp() {
 
 # Export aur diffs
 aurdiff() {
-  local d=~/pkgbuild-diffs
+  local d=~/pkgbuild-diffs clone p
   mkdir -p "$d"
+  rm -f "$d"/*.diff(N)                       # clear old diffs (N = safe when none exist)
   for p in $(paru -Qua | awk '{print $1}'); do
-    [ -d ~/.cache/paru/clone/"$p" ] && git -C ~/.cache/paru/clone/"$p" log -p -1 > "$d/$p.diff"
+    clone=~/.cache/paru/clone/"$p"
+    [ -d "$clone" ] || continue
+    git -C "$clone" fetch -q 2>/dev/null     # pull fresh commits, don't touch working tree
+    git -C "$clone" diff HEAD origin/master > "$d/$p.diff"   # incoming = new vs. currently-installed
   done
   ls -la "$d"
 }

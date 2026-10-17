@@ -7,3 +7,4 @@ bin/.local/bin/swival
 bin/.local/bin/obsidian
 agy*
 *.wants/
+claude*

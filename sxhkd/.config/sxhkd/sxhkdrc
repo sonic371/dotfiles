@@ -34,10 +34,10 @@ super + d
 #super + s
 #	~/.config/scripts/dmenu_define.sh
 super + q
-    xdotool getactivewindow windowkill
+    	xdotool getactivewindow windowkill
 
 super + Return
-    st
+    	st
 
 super + w
 	~/.config/scripts/record-webcam.sh

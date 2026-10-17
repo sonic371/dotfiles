@@ -1,5 +1,7 @@
 #!/bin/bash
 i3lock \
+  --nofork \
+  --composite \
   --blur=5 \
   --clock \
   --indicator \

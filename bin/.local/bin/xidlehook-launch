@@ -1,0 +1,18 @@
+#!/bin/bash
+# xidlehook idle timers, chosen by the active autorandr profile.
+#   default:        dim after 60s idle, suspend 2100s later
+#   projector-only: no dim, suspend after 2100s idle
+
+profile="$(autorandr --current 2>/dev/null)"
+
+case "$profile" in
+    projector-only)
+        exec /usr/bin/xidlehook --not-when-audio \
+            --timer 2100 'systemctl suspend' ''
+        ;;
+    *)
+        exec /usr/bin/xidlehook --not-when-audio \
+            --timer 300 'xset dpms force off' '' \
+            --timer 2100 'systemctl suspend' ''
+        ;;
+esac

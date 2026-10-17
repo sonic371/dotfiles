@@ -4,7 +4,7 @@ PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/xss-lock --ignore-xss --transfer-sleep-lock --session=1 -- /usr/local/bin/slock
+ExecStart=/usr/bin/xss-lock --ignore-xss --transfer-sleep-lock --session=${XDG_SESSION_ID} -- %h/.config/scripts/slock.sh
 Restart=on-failure
 RestartSec=2s
 

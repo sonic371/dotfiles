@@ -38,7 +38,7 @@ export XMODIFIERS=@im=fcitx5
 
 # === SYSTEMD USER SESSION SETUP ===
 # Import environment variables into systemd user session
-systemctl --user import-environment DISPLAY XAUTHORITY PATH GTK_IM_MODULE QT_IM_MODULE XMODIFIERS
+systemctl --user import-environment DISPLAY XAUTHORITY XDG_SESSION_ID PATH GTK_IM_MODULE QT_IM_MODULE XMODIFIERS
 
 # Setup cleanup trap to stop the graphical session on exit or termination
 cleanup() {

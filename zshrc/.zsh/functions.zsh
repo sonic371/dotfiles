@@ -16,6 +16,18 @@ y() {
     fi
 }
 
+# Rebuild and install a source tree under ~/.local/src. git clean -fd deletes
+# untracked files, so refuse to run anywhere else.
+rebuild() {
+    local top
+    top="$(git rev-parse --show-toplevel 2>/dev/null)"
+    if [[ "$top" != "$HOME/.local/src/"* || "$PWD" != "$top" || ! -f Makefile ]]; then
+        echo "rebuild: run from the top of a ~/.local/src repo with a Makefile" >&2
+        return 1
+    fi
+    git clean -fd && sudo make clean install
+}
+
 # ============================================================================
 # RELOAD FUNCTION
 # ============================================================================
@@ -34,7 +46,7 @@ prev() {
 
 # Quick encode function (using your last preview command)
 enc() {
-    ffmpeg -i "$1" ${@:2} -c:v libx264 -c:a aac
+    ffmpeg -i "$1" -c:v libx264 -c:a aac "${@:2}"
 }
 
 # Video compression

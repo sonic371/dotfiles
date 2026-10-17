@@ -1,76 +1,78 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+# Bootstrap a fresh Arch install from the dotfiles repo.
+# Safe to re-run: every step skips work that is already done.
 
-# Exit on error and Print commands as they're executed
-set -ex
+set -euo pipefail
 
-echo "Starting system setup..."
+DOTS="$HOME/dotfiles"
+REPO="https://github.com/sonic371/dotfiles.git"
 
-# Update system first
+echo "==> System update and bootstrap packages"
 sudo pacman -Syu --noconfirm
+sudo pacman -S --needed --noconfirm base-devel git git-lfs stow zsh
 
-# Install core packages
-sudo pacman -S --noconfirm fd ripgrep fzf zoxide eza git git-lfs stow yazi zsh
-
-# Install base development tools
-sudo pacman -S --needed --noconfirm base-devel
-
-# Install Xorg and related packages
-sudo pacman -S --noconfirm xorg-xinit xorg-server libxinerama libxft imlib2
-
-# Change default shell to zsh
-echo "Changing default shell to zsh..."
-chsh -s /usr/bin/zsh
-
-# Clone and stow dotfiles
-echo "Setting up dotfiles..."
-if [ ! -d "$HOME/dotfiles" ]; then
-    git clone https://github.com/sonic371/dotfiles.git $HOME/dotfiles
+echo "==> Dotfiles"
+git lfs install
+if [ ! -d "$DOTS" ]; then
+    git clone --recurse-submodules "$REPO" "$DOTS"
 else
-    echo "Dotfiles directory already exists, skipping clone..."
+    echo "$DOTS exists, skipping clone"
+    git -C "$DOTS" submodule update --init --recursive
+fi
+git -C "$DOTS" lfs pull
+
+echo "==> Packages from .pkglist"
+# Install what the official repos provide; AUR packages are listed for paru.
+pkglist="$DOTS/.pkglist/pkglist.txt"
+mapfile -t repo_pkgs < <(comm -12 <(sort -u "$pkglist") <(pacman -Slq | sort -u))
+mapfile -t aur_pkgs < <(comm -23 <(sort -u "$pkglist") <(pacman -Slq | sort -u))
+sudo pacman -S --needed --noconfirm "${repo_pkgs[@]}"
+if [ "${#aur_pkgs[@]}" -gt 0 ]; then
+    echo "Not in official repos (install with paru -S --needed): ${aur_pkgs[*]}"
 fi
 
-# Run stow with --override flag to handle existing files
-cd $HOME/dotfiles && stow --verbose --override=.* -t $HOME zshrc
-
-# Clone additional repositories
-echo "Cloning additional repositories..."
-mkdir -p $HOME/.local/src
-
-if [ ! -d "$HOME/.local/src/st-flexipatch" ]; then
-    git clone https://github.com/bakkeby/st-flexipatch.git $HOME/.local/src/st-flexipatch
-else
-    echo "st-flexipatch directory already exists, skipping clone..."
+echo "==> Stow home packages"
+# Packages containing etc/ belong under / and are handled below
+home_pkgs=()
+for p in "$DOTS"/*/; do
+    p=${p%/}
+    [ -d "$p/etc" ] || home_pkgs+=("${p##*/}")
+done
+# Move aside the skeleton .bashrc a new account gets, or stow aborts
+if [ -f "$HOME/.bashrc" ] && [ ! -L "$HOME/.bashrc" ]; then
+    mv "$HOME/.bashrc" "$HOME/.bashrc.orig"
 fi
+stow -d "$DOTS" -t "$HOME" "${home_pkgs[@]}"
 
-if [ ! -d "$HOME/.local/src/dwm" ]; then
-    git clone https://github.com/sonic371/dwm $HOME/.local/src/dwm
-else
-    echo "dwm directory already exists, skipping clone..."
-fi
+echo "==> System packages"
+# Copied rather than symlinked so they don't depend on /home being mounted
+sudo cp -r --no-preserve=ownership "$DOTS/xorg-conf/etc/." /etc/
+sudo cp -r --no-preserve=ownership "$DOTS/systemd-system/etc/." /etc/
+sudo systemctl daemon-reload
+sudo systemctl enable autocpufreq.service disable-mic-led.service
 
-# Install Oh My Zsh (only if not already installed)
-echo "Installing Oh My Zsh..."
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
-else
-    echo "Oh My Zsh already installed, skipping..."
-fi
+echo "==> User services"
+# *.wants/ links are gitignored, so enable units explicitly
+systemctl --user daemon-reload
+# dunst and the portal ship without [Install], so attach them directly
+systemctl --user add-wants graphical-session.target \
+    dunst.service xdg-desktop-portal-gtk.service
+systemctl --user enable \
+    change-wallpaper.service dwmblocks.service dwmblocks-musicup.service \
+    fcitx5.service mega-sync.service picom.service sxhkd.service \
+    unclutter.service xidlehook.service xss-lock.service \
+    battery-alert.timer change-wallpaper.timer
 
-# Install zsh-autosuggestions
-if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
-    echo "Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-else
-    echo "zsh-autosuggestions already installed, skipping..."
-fi
+echo "==> Source trees in ~/.local/src"
+mkdir -p "$HOME/.local/src"
+clone() {
+    [ -d "$HOME/.local/src/$1" ] && { echo "$1 exists, skipping"; return; }
+    git clone "$2" "$HOME/.local/src/$1"
+}
+clone st-flexipatch https://github.com/bakkeby/st-flexipatch.git
+clone dwm https://github.com/sonic371/dwm
 
-# Install zsh-syntax-highlighting
-if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
-    echo "Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-else
-    echo "zsh-syntax-highlighting already installed, skipping..."
-fi
+echo "==> Login shell"
+[ "$(getent passwd "$USER" | cut -d: -f7)" = /usr/bin/zsh ] || chsh -s /usr/bin/zsh
 
-echo "Setup complete!"
-echo "NOTE: You may need to log out and back in for shell changes to take effect."
+echo "Setup complete. Log out and back in, then build dwm/st with: rebuild"

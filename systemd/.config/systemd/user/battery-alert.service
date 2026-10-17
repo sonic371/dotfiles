@@ -7,7 +7,4 @@ PartOf=graphical-session.target
 Type=oneshot
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=%h/.Xauthority
-ExecStart=%h/dotfiles/dunst/.config/dunst/scripts/battery-alert.sh
-
-[Install]
-WantedBy=default.target
+ExecStart=%h/.config/dunst/scripts/battery-alert.sh

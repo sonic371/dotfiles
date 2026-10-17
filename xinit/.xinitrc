@@ -5,15 +5,13 @@
 
 # === CONFIGURATION ===
 IDLE_TIMEOUT=2100      # 35 minutes
-LOCK_TIMEOUT=600       # 10 minutes
-UNCLUTTER_IDLE=3
 
 # === HARDWARE & SYSTEM SETUP ===
 # Input devices — configured via /etc/X11/xorg.conf.d/40-touchpad.conf
 # setxkbmap -option altwin:swap_ralt_rwin 2>/dev/null
 
 # Display setup
-autorandr -c || echo "Warning: autorandr failed to apply display config" 2>/dev/null
+autorandr -c || echo "Warning: autorandr failed to apply display config" >&2
 
 # X resources
 xrdb -merge ~/.Xresources 2>/dev/null

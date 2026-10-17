@@ -14,4 +14,8 @@ function zle-keymap-select {
     esac
 }
 zle -N zle-keymap-select
+
+# Reset to beam at each new prompt (otherwise stays block after a vicmd command)
+function zle-line-init { echo -ne '\e[5 q' }
+zle -N zle-line-init
 echo -ne '\e[5 q'  # beam cursor on startup

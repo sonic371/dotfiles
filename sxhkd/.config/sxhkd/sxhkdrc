@@ -51,9 +51,6 @@ super + r
 super + v
 	~/.config/scripts/sxhkd-toggle-rotate.sh
 
-super + button1_up
-        ~/.config/scripts/sxhkd_sync_symbol.sh
-
 # Thinkpad media keys
 XF86Display
 	~/.local/bin/tool-redshift-toggle >/dev/null 2>&1

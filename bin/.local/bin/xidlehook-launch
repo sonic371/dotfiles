@@ -1,6 +1,6 @@
 #!/bin/bash
 # xidlehook idle timers, chosen by the active autorandr profile.
-#   default:        dim after 60s idle, suspend 2100s later
+#   default:        screen off after 300s idle, suspend 2100s later
 #   projector-only: no dim, suspend after 2100s idle
 
 profile="$(autorandr --current 2>/dev/null)"

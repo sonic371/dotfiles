@@ -1,11 +1,6 @@
 #!/bin/bash
 # Restart xidlehook after a display-profile change so it applies the right
-# dim/suspend timers. autorandr runs as the user at login and as root on
-# hotplug (udev -> autorandr.service); handle both.
-if [ "$(id -u)" -eq 0 ]; then
-    uid="$(loginctl list-users --no-legend 2>/dev/null | awk 'NR==1{print $1}')"
-    [ -n "$uid" ] || exit 0
-    XDG_RUNTIME_DIR="/run/user/$uid" systemctl --user try-restart xidlehook.service
-else
-    systemctl --user try-restart xidlehook.service
-fi
+# dim/suspend timers. autorandr --batch (hotplug) runs hooks as the session
+# user; a manual root run has no user manager to reach, so skip it.
+[ "$(id -u)" -eq 0 ] && exit 0
+systemctl --user try-restart xidlehook.service

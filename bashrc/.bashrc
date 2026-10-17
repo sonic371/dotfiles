@@ -31,7 +31,3 @@ for file in "${bash_config_files[@]}"; do
   fi
 done
 
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/wade/.local/bin:$PATH"

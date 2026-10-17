@@ -49,7 +49,7 @@ echo "==> System packages"
 sudo cp -r --no-preserve=ownership "$DOTS/xorg-conf/etc/." /etc/
 sudo cp -r --no-preserve=ownership "$DOTS/systemd-system/etc/." /etc/
 sudo systemctl daemon-reload
-sudo systemctl enable autocpufreq.service disable-mic-led.service
+sudo systemctl enable auto-cpufreq.service disable-mic-led.service
 
 echo "==> User services"
 # *.wants/ links are gitignored, so enable units explicitly

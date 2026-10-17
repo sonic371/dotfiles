@@ -9,11 +9,11 @@
 zsh_config_files=(
   env.zsh
   paths.zsh
+  options.zsh             # runs compinit; must precede fzf/zoxide
   fzf-integration.zsh
   zoxide-integration.zsh
   aliases.zsh
   functions.zsh
-  options.zsh
   vi-mode.zsh
   prompt.zsh
   dotfiles.zsh

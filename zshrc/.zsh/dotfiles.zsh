@@ -64,42 +64,34 @@ dots-update() {
 
 # List available packages
 dots-list() {
-    cd ~/dotfiles
     echo "📦 Available packages:"
-    for p in */; do
-        [ -d "$p" ] && [ "$p" != ".git/" ] && echo "  • ${p%/}"
-    done
+    _dots-pkgs | sed 's/^/  • /'
 }
 
-# Check status of packages
+# Check that each package's files resolve into the repo. Stow folds whole
+# directories into one symlink, so compare resolved paths, not -L.
 dots-check() {
-    cd ~/dotfiles
+    local pkg f rel
     echo "🔍 Checking symlinks..."
-    for pkg in */; do
-        if [ -d "$pkg" ] && [ "$pkg" != ".git/" ]; then
-            echo "\n${pkg%/}:"
-            find "$pkg" -type f | head -3 | while read f; do
-                target="$HOME/${f#$pkg/}"
-                if [ -L "$target" ]; then
-                    echo "  ✅ ${f#$pkg/}"
-                else
-                    echo "  📄 ${f#$pkg/} (regular file)"
-                fi
-            done
-        fi
+    for pkg in $(_dots-pkgs); do
+        echo "\n$pkg:"
+        for f in $_DOTS_DIR/$pkg/**/*~*/(plugins/*|.stow-local-ignore)(.DN[1,3]); do
+            rel=${f#$_DOTS_DIR/$pkg/}
+            if [[ ${${:-$HOME/$rel}:A} == ${f:A} ]]; then
+                echo "  ✅ $rel"
+            else
+                echo "  📄 $rel (not linked)"
+            fi
+        done
     done
 }
 
 # Install specific packages
 dots-install-pkg() {
-    cd ~/dotfiles
-    stow -t ~ "$@"
-    echo "✅ Installed packages: $@"
+    _dots-stow "$@" && echo "✅ Installed packages: $*"
 }
 
 # Remove specific packages
 dots-remove-pkg() {
-    cd ~/dotfiles
-    stow -D -t ~ "$@"
-    echo "🗑️  Removed packages: $@"
+    _dots-stow -D "$@" && echo "🗑️  Removed packages: $*"
 }

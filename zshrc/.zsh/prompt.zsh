@@ -3,4 +3,4 @@
 # ============================================================================
 # Single responsibility: Configure the shell prompt and theme
 
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"

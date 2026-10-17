@@ -31,8 +31,9 @@ rebuild() {
 # ============================================================================
 # RELOAD FUNCTION
 # ============================================================================
+# Replace the shell with a fresh one so removed settings don't linger
 reload() {
-    source ~/.zshrc && echo "ZSH configuration reloaded"
+    exec zsh
 }
 
 # ============================================================================
@@ -41,7 +42,7 @@ reload() {
 
 # Quick preview function
 prev() {
-    ffmpeg -i "$1" ${@:2} -f matroska - | ffplay -
+    ffmpeg -i "$1" "${@:2}" -f matroska - | ffplay -
 }
 
 # Quick encode function (using your last preview command)

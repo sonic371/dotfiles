@@ -13,3 +13,6 @@
 [submodule "zshrc/plugins/zsh-syntax-highlighting"]
 	path = zshrc/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
+[submodule "zshrc/plugins/fzf-tab"]
+	path = zshrc/plugins/fzf-tab
+	url = https://github.com/Aloxaf/fzf-tab.git

@@ -14,6 +14,7 @@ setopt extended_history         # Save timestamps and duration
 setopt hist_fcntl_lock          # Use system file locking to prevent corruption
 setopt hist_ignore_all_dups     # Drop older duplicates of a command
 setopt hist_reduce_blanks       # Remove superfluous blanks from commands
+setopt hist_ignore_space        # Commands starting with a space aren't saved
 
 # Real-time history sync between terminals: share_history writes each command
 # immediately and incrementally reads new entries from other shells.
@@ -33,4 +34,7 @@ setopt extended_glob            # Enable globbing patterns like **/*.txt
 # TAB COMPLETION
 # ----------------------------------------------------------------------------
 autoload -Uz compinit && compinit
-zstyle ':completion:*' menu select
+zstyle ':completion:*' menu no                         # fzf-tab draws the menu
+zstyle ':completion:*:descriptions' format '[%d]'      # group names for fzf-tab
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'  # case-insensitive
+zstyle ':completion:*' list-colors ''                   # zsh's default colors

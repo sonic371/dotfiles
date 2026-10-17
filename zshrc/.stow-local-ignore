@@ -1,0 +1,2 @@
+# Plugins are sourced from the repo by .zsh/plugins.zsh; never link them into ~
+^/plugins$

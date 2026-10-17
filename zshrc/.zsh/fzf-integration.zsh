@@ -22,7 +22,7 @@ if command -v fzf &>/dev/null; then
 
   # Preview when selecting directories (ALT-C)
   export FZF_ALT_C_OPTS='
-    --preview="tree -C {} | head -200"
+    --preview="eza --tree --level=2 --color=always {} | head -200"
   '
 
   # Source fzf key bindings and fuzzy completion if available

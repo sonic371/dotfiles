@@ -33,7 +33,7 @@ case "${BLOCK_BUTTON:-}" in
         pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null
         ;;
     6) # Other button - edit script
-        ${TERMINAL:-kitty} -e ${EDITOR:-vim} "$0"
+        ${TERMINAL:-kitty} -e ${EDITOR:-vim} "$0" >/dev/null 2>&1 &
         ;;
 esac
 

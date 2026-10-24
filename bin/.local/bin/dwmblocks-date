@@ -31,7 +31,7 @@ case $BLOCK_BUTTON in
                 opts=()
                 ;;
         esac
-        $TERMINAL "${opts[@]}" -e calcurse
+        $TERMINAL "${opts[@]}" -e calcurse >/dev/null 2>&1 &
         ;;
     6) 
         # Define terminal-specific options for window name (editor)
@@ -46,7 +46,7 @@ case $BLOCK_BUTTON in
                 opts=()
                 ;;
         esac
-        $TERMINAL "${opts[@]}" -e "$EDITOR" "$0"
+        $TERMINAL "${opts[@]}" -e "$EDITOR" "$0" >/dev/null 2>&1 &
         ;;
 esac
 

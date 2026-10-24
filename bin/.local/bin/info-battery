@@ -5,7 +5,7 @@ battery_info=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 2>/dev/nul
 
 if [ -z "$battery_info" ]; then
     echo "󱊣 ?%"
-    exit 1
+    exit 0
 fi
 
 # Extract values

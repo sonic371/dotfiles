@@ -1,0 +1,24 @@
+#!/bin/sh
+# Keep the Wacom pen's lower button in pan mode, re-applying on every replug/reconnect
+DEVICE="Wacom Intuos BT S Pen stylus"
+
+apply() {
+    # X adds the device shortly after udev does, so retry for a few seconds
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        if xsetwacom --list devices | grep -qF "$DEVICE"; then
+            xsetwacom --set "$DEVICE" PanScrollThreshold 200
+            xsetwacom --set "$DEVICE" Button 2 "pan"
+            return
+        fi
+        sleep 0.5
+    done
+}
+
+apply
+
+# Only react to the pen itself, so plugging in other devices doesn't undo a manual toggle
+udevadm monitor --udev --subsystem-match=input | while read -r _ _ action devpath _; do
+    [ "$action" = add ] || continue
+    case "$devpath" in */event*) ;; *) continue ;; esac
+    grep -qF "Wacom Intuos BT S Pen" "/sys$devpath/device/name" 2>/dev/null && apply
+done

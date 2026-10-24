@@ -2,27 +2,22 @@
 DEVICE="Wacom Intuos BT S Pen stylus"
 
 # Check if the device exists
-if ! xsetwacom --list devices | grep -q "$DEVICE"; then
+if ! xsetwacom --list devices | grep -qF "$DEVICE"; then
     notify-send -u critical "Wacom Script Error" "Wacom device not found"
-    echo "Error: Wacom device not found"
+    echo "Error: Wacom device not found" >&2
     exit 1
 fi
 
 # Get the actual current button mapping from the device
-CURRENT_BUTTON=$(xsetwacom --get "$DEVICE" Button 2)
+CURRENT_BUTTON=$(xsetwacom --get "$DEVICE" Button 2) || exit 1
 
-# Determine current mode based on actual device state
-# When in pan mode, CURRENT_BUTTON is empty
-# When in button mode, CURRENT_BUTTON is "button +2"
-if [ -z "$CURRENT_BUTTON" ]; then
-    # Currently in pan mode, switch to button mode
-    echo "Switching to button mode..."
-    notify-send -t 2000 "Wacom Mode" "Switching to button mode..."
-    xsetwacom --set "$DEVICE" Button 2 "button +2"
-else
-    # Currently in button mode, switch to pan mode
-    echo "Switching to pan mode..."
-    notify-send -t 2000 "Wacom Mode" "Switching to pan mode..."
-    xsetwacom --set "$DEVICE" Button 2 "pan"
-    xsetwacom --set "$DEVICE" "PanScrollThreshold" 200
-fi
+# Button mode reports "button +2"; anything else (empty or "pan") is pan mode
+case "$CURRENT_BUTTON" in
+    *"button +2"*)
+        xsetwacom --set "$DEVICE" PanScrollThreshold 200 &&
+        xsetwacom --set "$DEVICE" Button 2 "pan" &&
+        notify-send -t 2000 "Wacom Mode" "Pan mode" ;;
+    *)
+        xsetwacom --set "$DEVICE" Button 2 "button +2" &&
+        notify-send -t 2000 "Wacom Mode" "Button mode" ;;
+esac

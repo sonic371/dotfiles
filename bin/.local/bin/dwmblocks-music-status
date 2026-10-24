@@ -9,13 +9,15 @@ case "$BLOCK_BUTTON" in
     5) playerctl position 10+ ;;
 esac
 
-status="$(playerctl --no-messages status)" || exit 1
+# Exit 0 with no output to hide the block; dwmblocks keeps the old text on a
+# non-zero exit.
+status="$(playerctl --no-messages status)" || exit 0
 case "$status" in
     Stopped) exit ;;
     Paused) icon="" ;;
     Playing) icon="󰝚" ;;
 esac
 
-song="$(playerctl metadata --format="{{title}} - {{artist}}")" || exit 2
+song="$(playerctl metadata --format="{{title}} - {{artist}}")" || exit 0
 
 echo "$icon $song"

@@ -1,0 +1,16 @@
+[Unit]
+Description=gptokeyb2 8pen mapping for the Nintendo Switch Pro Controller
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+# Only let SDL open the Switch Pro Controller (USB or Bluetooth, 057e:2009).
+# Every other controller (Xbox etc.) is ignored and stays a normal gamepad.
+Environment=SDL_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT=0x057e/0x2009
+# stdbuf: line-buffer output so it shows up in the journal right away.
+ExecStart=/usr/bin/stdbuf -oL /home/wade/.local/src/gptokeyb2/build/gptokeyb2 -c /home/wade/.local/src/gptokeyb2/pro_8pen.ini
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

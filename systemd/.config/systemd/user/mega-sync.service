@@ -1,12 +1,16 @@
 [Unit]
-Description=MEGA Sync Client
+Description=MEGA Sync Client (MEGAcmd server)
 PartOf=graphical-session.target
 After=graphical-session.target
 
 [Service]
-Type=oneshot
-ExecStart=/usr/bin/mega-sync
-RemainAfterExit=yes
+# Run the server itself: it resumes the saved session and syncs on its own.
+# (Running the `mega-sync` client as a oneshot raced the login and, on failure,
+# systemd stopped the unit and the server with it.)
+Type=simple
+ExecStart=/usr/bin/mega-cmd-server --do-not-log-to-stdout
+Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=graphical-session.target

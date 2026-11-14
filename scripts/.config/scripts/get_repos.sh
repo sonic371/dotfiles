@@ -3,37 +3,38 @@
 
 set -e  # Exit on error
 
-# Create base directory for source code
-mkdir -p "$HOME/.local/src"
+# Suckless tools (and dwmblocks-async) live together under ~/.local/src/suckless
+SRC="$HOME/.local/src/suckless"
+mkdir -p "$SRC"
 
 # Clone st-flexipatch
-if [ ! -d "$HOME/.local/src/st-flexipatch" ]; then
+if [ ! -d "$SRC/st-flexipatch" ]; then
     echo "Cloning st-flexipatch..."
-    git clone https://github.com/sonic371/st-flexipatch.git "$HOME/.local/src/st-flexipatch"
+    git clone https://github.com/sonic371/st-flexipatch.git "$SRC/st-flexipatch"
 else
     echo "st-flexipatch already exists, skipping..."
 fi
 
 # Clone dwm
-if [ ! -d "$HOME/.local/src/dwm" ]; then
+if [ ! -d "$SRC/dwm" ]; then
     echo "Cloning dwm..."
-    git clone https://github.com/sonic371/dwm.git "$HOME/.local/src/dwm"
+    git clone https://github.com/sonic371/dwm.git "$SRC/dwm"
 else
     echo "dwm already exists, skipping..."
 fi
 
 # Clone dwmblocks-async
-if [ ! -d "$HOME/.local/src/dwmblocks-async" ]; then
+if [ ! -d "$SRC/dwmblocks-async" ]; then
     echo "Cloning dwmblocks-async..."
-    git clone https://github.com/sonic371/dwmblocks-async.git "$HOME/.local/src/dwmblocks-async"
+    git clone https://github.com/sonic371/dwmblocks-async.git "$SRC/dwmblocks-async"
 else
     echo "dwmblocks-async already exists, skipping..."
 fi
 
 # Clone dmenu
-if [ ! -d "$HOME/.local/src/dmenu" ]; then
+if [ ! -d "$SRC/dmenu" ]; then
     echo "Cloning dmenu..."
-    git clone https://github.com/sonic371/dmenu.git "$HOME/.local/src/dmenu"
+    git clone https://github.com/sonic371/dmenu.git "$SRC/dmenu"
 else
     echo "dmenu already exists, skipping..."
 fi

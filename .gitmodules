@@ -1,12 +1,3 @@
-[submodule "dwm/.local/src/dwm"]
-	path = dwm/.local/src/dwm
-	url = https://git.suckless.org/dwm
-[submodule "dmenu/.local/src/dmenu"]
-	path = dmenu/.local/src/dmenu
-	url = https://git.suckless.org/dmenu
-[submodule "dwmblocks-async/.local/src/dwmblocks-async"]
-	path = dwmblocks-async/.local/src/dwmblocks-async
-	url = https://github.com/UtkarshVerma/dwmblocks-async.git
 [submodule "zshrc/plugins/zsh-autosuggestions"]
 	path = zshrc/plugins/zsh-autosuggestions
 	url = https://github.com/zsh-users/zsh-autosuggestions.git

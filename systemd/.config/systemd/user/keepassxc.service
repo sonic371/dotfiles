@@ -1,0 +1,12 @@
+[Unit]
+Description=KeePassXC password manager (Secret Service provider)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/keepassxc --minimized
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=graphical-session.target

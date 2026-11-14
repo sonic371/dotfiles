@@ -5,6 +5,10 @@ After=graphical-session.target
 
 [Service]
 ExecStart=/usr/local/bin/dwmblocks
+# At login the volume and mic blocks run before WirePlumber has created the
+# audio devices. Once a real default sink and source exist (up to 10s), refresh
+# them with RTMIN+8 (volume) and RTMIN+6 (mic).
+ExecStartPost=-/bin/sh -c 'for _ in $$(seq 50); do sink=$$(pactl get-default-sink 2>/dev/null) && [ "$$sink" != auto_null ] && pactl get-source-mute @DEFAULT_SOURCE@ >/dev/null 2>&1 && break; sleep 0.2; done; kill -42 $MAINPID; kill -40 $MAINPID'
 Restart=on-failure
 RestartSec=2s
 

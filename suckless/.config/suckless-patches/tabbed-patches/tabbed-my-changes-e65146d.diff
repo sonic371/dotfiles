@@ -1,0 +1,192 @@
+# Local changes to suckless tabbed, against upstream origin/master (e65146d).
+# Includes:  + uncommitted edits
+# Apply: git checkout e65146d && git apply tabbed-my-changes-e65146d.diff
+diff --git a/config.def.h b/config.def.h
+index 51bb13d..35b2423 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -63,4 +63,13 @@ static const Key keys[] = {
+ 	{ MODKEY|ShiftMask,     XK_u,      toggle,      { .v = (void*) &urgentswitch } },
+ 
+ 	{ 0,                    XK_F11,    fullscreen,  { 0 } },
++
++	{ MODKEY,               XK_Shift_L, showbar,    { .i = 1 } },
++	{ ShiftMask,            XK_Control_L, showbar,    { .i = 1 } },
++};
++
++static Key keyreleases[] = {
++	/* modifier             key          function     argument */
++	{ MODKEY|ShiftMask,     XK_Shift_L,  showbar,     { .i = 0 } },
++	{ MODKEY|ShiftMask,     XK_Control_L,  showbar,     { .i = 0 } },
+ };
+diff --git a/tabbed.c b/tabbed.c
+index 2fb5aa7..f350195 100644
+--- a/tabbed.c
++++ b/tabbed.c
+@@ -114,6 +114,7 @@ static Bool gettextprop(Window w, Atom atom, char *text, unsigned int size);
+ static void initfont(const char *fontstr);
+ static Bool isprotodel(int c);
+ static void keypress(const XEvent *e);
++static void keyrelease(const XEvent *e);
+ static void killclient(const Arg *arg);
+ static void manage(Window win);
+ static void maprequest(const XEvent *e);
+@@ -126,6 +127,7 @@ static void run(void);
+ static void sendxembed(int c, long msg, long detail, long d1, long d2);
+ static void setcmd(int argc, char *argv[], int);
+ static void setup(void);
++static void showbar(const Arg *arg);
+ static void spawn(const Arg *arg);
+ static int textnw(const char *text, unsigned int len);
+ static void toggle(const Arg *arg);
+@@ -149,10 +151,11 @@ static void (*handler[LASTEvent]) (const XEvent *) = {
+ 	[Expose] = expose,
+ 	[FocusIn] = focusin,
+ 	[KeyPress] = keypress,
++	[KeyRelease] = keyrelease,
+ 	[MapRequest] = maprequest,
+ 	[PropertyNotify] = propertynotify,
+ };
+-static int bh, obh, wx, wy, ww, wh;
++static int bh, wx, wy, ww, wh, vbh;
+ static unsigned int numlockmask;
+ static Bool running = True, nextfocus, doinitspawn = True,
+             fillagain = False, closelastclient = False,
+@@ -169,6 +172,7 @@ static char winid[64];
+ static char **cmd;
+ static char *wmname = "tabbed";
+ static const char *geometry;
++static Bool barvisibility = False;
+ 
+ char *argv0;
+ 
+@@ -257,16 +261,8 @@ configurenotify(const XEvent *e)
+ 		dc.drawable = XCreatePixmap(dpy, root, ww, wh,
+ 		              DefaultDepth(dpy, screen));
+ 
+-		if (!obh && (wh <= bh)) {
+-			obh = bh;
+-			bh = 0;
+-		} else if (!bh && (wh > obh)) {
+-			bh = obh;
+-			obh = 0;
+-		}
+-
+ 		if (sel > -1)
+-			resize(sel, ww, wh - bh);
++			resize(sel, ww, wh);
+ 		XSync(dpy, False);
+ 	}
+ }
+@@ -280,9 +276,9 @@ configurerequest(const XEvent *e)
+ 
+ 	if ((c = getclient(ev->window)) > -1) {
+ 		wc.x = 0;
+-		wc.y = bh;
++		wc.y = 0;
+ 		wc.width = ww;
+-		wc.height = wh - bh;
++		wc.height = wh;
+ 		wc.border_width = 0;
+ 		wc.sibling = ev->above;
+ 		wc.stack_mode = ev->detail;
+@@ -324,9 +320,16 @@ void
+ drawbar(void)
+ {
+ 	XftColor *col;
+-	int c, cc, fc, width;
++	int c, cc, fc, width, nbh;
+ 	char *name = NULL;
+ 
++	nbh = barvisibility ? vbh : 0;
++	if (nbh != bh)
++		bh = nbh;
++
++	if (nclients > 0)
++		return;
++
+ 	if (nclients == 0) {
+ 		dc.x = 0;
+ 		dc.w = ww;
+@@ -464,7 +467,7 @@ focus(int c)
+ 	if (c < 0 || c >= nclients)
+ 		return;
+ 
+-	resize(c, ww, wh - bh);
++	resize(c, ww, wh);
+ 	XRaiseWindow(dpy, clients[c]->win);
+ 	XSetInputFocus(dpy, clients[c]->win, RevertToParent, CurrentTime);
+ 	sendxembed(c, XEMBED_FOCUS_IN, XEMBED_FOCUS_CURRENT, 0, 0);
+@@ -685,6 +688,22 @@ keypress(const XEvent *e)
+ 	}
+ }
+ 
++void
++keyrelease(const XEvent *e)
++{
++	const XKeyEvent *ev = &e->xkey;
++	unsigned int i;
++	KeySym keysym;
++
++	keysym = XkbKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0, 0);
++	for (i = 0; i < LENGTH(keyreleases); i++) {
++		if (keysym == keyreleases[i].keysym &&
++		    CLEANMASK(keyreleases[i].mod) == CLEANMASK(ev->state) &&
++		    keyreleases[i].func)
++			keyreleases[i].func(&(keyreleases[i].arg));
++	}
++}
++
+ void
+ killclient(const Arg *arg)
+ {
+@@ -720,7 +739,7 @@ manage(Window w)
+ 		XEvent e;
+ 
+ 		XWithdrawWindow(dpy, w, 0);
+-		XReparentWindow(dpy, w, win, 0, bh);
++		XReparentWindow(dpy, w, win, 0, 0);
+ 		XSelectInput(dpy, w, PropertyChangeMask |
+ 		             StructureNotifyMask | EnterWindowMask);
+ 		XSync(dpy, False);
+@@ -893,7 +912,7 @@ resize(int c, int w, int h)
+ 	XWindowChanges wc;
+ 
+ 	ce.x = 0;
+-	ce.y = wc.y = bh;
++	ce.y = wc.y = 0;
+ 	ce.width = wc.width = w;
+ 	ce.height = wc.height = h;
+ 	ce.type = ConfigureNotify;
+@@ -1003,7 +1022,7 @@ setup(void)
+ 	screen = DefaultScreen(dpy);
+ 	root = RootWindow(dpy, screen);
+ 	initfont(font);
+-	bh = dc.h = dc.font.height + 2;
++	vbh = dc.h = dc.font.height + 2;
+ 
+ 	/* init atoms */
+ 	wmatom[WMDelete] = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+@@ -1063,7 +1082,7 @@ setup(void)
+ 	                          dc.norm[ColFG].pixel, dc.norm[ColBG].pixel);
+ 	XMapRaised(dpy, win);
+ 	XSelectInput(dpy, win, SubstructureNotifyMask | FocusChangeMask |
+-	             ButtonPressMask | ExposureMask | KeyPressMask |
++	             ButtonPressMask | ExposureMask | KeyPressMask | KeyReleaseMask |
+ 	             PropertyChangeMask | StructureNotifyMask |
+ 	             SubstructureRedirectMask);
+ 	xerrorxlib = XSetErrorHandler(xerror);
+@@ -1097,6 +1116,13 @@ setup(void)
+ 	focus(-1);
+ }
+ 
++void
++showbar(const Arg *arg)
++{
++	barvisibility = arg->i;
++	drawbar();
++}
++
+ void
+ spawn(const Arg *arg)
+ {

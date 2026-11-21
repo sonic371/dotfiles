@@ -34,7 +34,9 @@ if [[ $? -eq 0 ]]; then
     # Check if muted
     MUTED=$(pactl get-sink-mute "$SINK" | grep -oP '(?<=Mute: )\w+')
     
-    if [[ "$MUTED" == "yes" ]]; then
+    if [[ "$MUTED" == "yes" && "$1" == "mute" ]]; then
+        dunstify -r 999 -u critical -t 1000 "🔇 Muted"
+    elif [[ "$MUTED" == "yes" ]]; then
         VOL="0%"
         dunstify -r 999 -u low -t 1000 -h int:value:0 \
             "Volume: Muted" -h string:hlcolor:#ffffff

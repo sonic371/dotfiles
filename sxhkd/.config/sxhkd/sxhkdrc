@@ -1,6 +1,6 @@
-# Essentials
+# ── Volume, mic, brightness ─────────────────────────────────
 XF86AudioMute
-	~/.config/scripts/sxhkd-toggle-volume.sh
+	~/.config/scripts/sxhkd-volume.sh mute
 
 XF86AudioLowerVolume
 	~/.config/scripts/sxhkd-volume.sh down
@@ -8,57 +8,49 @@ XF86AudioLowerVolume
 XF86AudioRaiseVolume
 	~/.config/scripts/sxhkd-volume.sh up
 
-# Brightness down with notification
-XF86MonBrightnessDown
-        ~/.config/scripts/sxhkd-brightness.sh down
-
-# Brightness up with notification
-XF86MonBrightnessUp
-        ~/.config/scripts/sxhkd-brightness.sh up
-
 XF86AudioMicMute
 	~/.config/scripts/sxhkd-toggle-mic.sh
 
-# Screenshot functions
+XF86MonBrightnessDown
+	~/.config/scripts/sxhkd-brightness.sh down
+
+XF86MonBrightnessUp
+	~/.config/scripts/sxhkd-brightness.sh up
+
+# ── Screenshots (Print: select area, shift+Print: full screen) ─
 @Print
 	~/.config/scripts/sxhkd-maim.sh >/dev/null 2>&1
 
 shift + @Print
-	~/.config/scripts/sxhkd-maim_fullscreen.sh >/dev/null 2>&1
+	~/.config/scripts/sxhkd-maim.sh --full >/dev/null 2>&1
 
-# Dmenu
-super + d
-	dmenu_run_cus -fn 'Px437 DOS/V re. JPN30:size=14' -nb "#000000" -nf "#ffffff" -sb "#ffffff" -sf "#000000" -l 10 -h 30
-
-# Exec define script
-#super + s
-#	~/.config/scripts/dmenu_define.sh
-super + q
-    	xdotool getactivewindow windowkill
-
+# ── Launchers ───────────────────────────────────────────────
 super + Return
-    	st
+	st
 
-super + w
-	~/.config/scripts/record-webcam.sh
+# Dictionary: define the selected word
+super + s
+	~/.config/scripts/dmenu_define.sh
 
 super + y
 	~/.config/scripts/dmenu_media.sh
 
-super + r
-	~/.config/scripts/sxhkd_symbol.sh
+super + w
+	~/.config/scripts/record-webcam.sh
 
+# Toggle screen layout (laptop-only / laptop-manga)
 super + v
 	~/.config/scripts/sxhkd-toggle-rotate.sh
 
-# Thinkpad media keys
+# ── ThinkPad keys ───────────────────────────────────────────
 XF86Display
 	~/.local/bin/tool-redshift-toggle >/dev/null 2>&1
 
 XF86Favorites
-	~/.local/bin/tool-middle-buttom-toggle >/dev/null 2>&1
+	~/.local/bin/tool-middle-button-toggle >/dev/null 2>&1
 
-# Model B1: Click navigation
+# ── Model B1 remote ─────────────────────────────────────────
+# Prev/Next: scroll up/down
 XF86AudioPrev
 	xdotool click --repeat 3 4
 
@@ -68,12 +60,14 @@ XF86AudioNext
 XF86AudioPlay
 	playerctl play-pause
 
+# Back/Home: zoom in/out
 XF86Back
 	xdotool key ctrl+plus
 
 XF86HomePage
 	xdotool key ctrl+minus
 
+# Mail/WWW: volume up/down
 XF86Mail
 	~/.config/scripts/sxhkd-volume.sh up
 

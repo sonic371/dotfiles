@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Get current brightness values
-BRIGHT=$(brightnessctl g)
-MAX=$(brightnessctl m)
-PERCENT=$((BRIGHT * 100 / MAX))
-
 case "$1" in
     up)
         brightnessctl s +10% >/dev/null

@@ -105,6 +105,11 @@ def generate_dashboard(stats, config, recording=True, error_msg=None):
     else:
         config_table.add_row("System Audio", "[dim]Disabled[/dim]")
 
+    if config.get("save_script"):
+        config_table.add_row("On Save", os.path.basename(config["save_script"]))
+    else:
+        config_table.add_row("On Save", "[dim]None[/dim]")
+
     sub_grid.add_row(stats_table, config_table)
     body.add_row(sub_grid)
 
@@ -143,7 +148,18 @@ def main():
     parser.add_argument("-p", "--pip-position", choices=["bottom-right", "bottom-left", "top-right", "top-left"], default="bottom-left", help="Webcam overlay corner")
     parser.add_argument("--pip-scale", type=float, default=0.20, help="Webcam overlay width scale relative to screen width (0.1 to 0.5)")
 
+    parser.add_argument("--save-script", default="~/.config/scripts/record-saved.sh", help="Script gpu-screen-recorder runs after saving (gets file path and type)")
+    parser.add_argument("--no-save-script", action="store_true", help="Don't run a script after saving")
+
     args = parser.parse_args()
+
+    # Script to run once the file is saved (gpu-screen-recorder -sc)
+    save_script = None
+    if not args.no_save_script and args.save_script:
+        save_script = os.path.abspath(os.path.expanduser(args.save_script))
+        if not os.access(save_script, os.X_OK):
+            console.print(f"[yellow]Warning: save script {save_script} is missing or not executable. Skipping it.[/yellow]")
+            save_script = None
 
     # Setup Output File
     if args.output:
@@ -199,6 +215,9 @@ def main():
     if audio_inputs:
         cmd.extend(["-a", "|".join(audio_inputs)])
 
+    if save_script:
+        cmd.extend(["-sc", save_script])
+
     # Setup Logging
     log_dir = os.path.expanduser("~/.cache/record")
     os.makedirs(log_dir, exist_ok=True)
@@ -215,7 +234,8 @@ def main():
         "use_mic": use_mic,
         "mic_dev": args.mic_device if use_mic else None,
         "use_sys_audio": use_sys_audio,
-        "sys_audio_dev": args.system_audio_device if use_sys_audio else None
+        "sys_audio_dev": args.system_audio_device if use_sys_audio else None,
+        "save_script": save_script,
     }
 
     stats = {

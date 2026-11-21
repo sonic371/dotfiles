@@ -8,6 +8,7 @@ ExecStart=/usr/bin/sxhkd
 Environment="PATH=%h/.local/bin:%h/bin:/usr/local/bin:/usr/bin:/bin"
 Restart=on-failure
 RestartSec=2s
+KillMode=process
 
 [Install]
 WantedBy=graphical-session.target

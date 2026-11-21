@@ -63,14 +63,9 @@ systemctl --user enable \
     unclutter.service xidlehook.service xss-lock.service \
     battery-alert.timer change-wallpaper.timer
 
-echo "==> Source trees in ~/.local/src"
-mkdir -p "$HOME/.local/src"
-clone() {
-    [ -d "$HOME/.local/src/$1" ] && { echo "$1 exists, skipping"; return; }
-    git clone "$2" "$HOME/.local/src/$1"
-}
-clone st-flexipatch https://github.com/bakkeby/st-flexipatch.git
-clone dwm https://github.com/sonic371/dwm
+echo "==> Source trees in ~/.local/src/suckless"
+# st, dwm, dwmblocks-async and dmenu (sonic371 forks); skips any already cloned
+sh "$DOTS/scripts/.config/scripts/get_repos.sh"
 
 echo "==> Login shell"
 [ "$(getent passwd "$USER" | cut -d: -f7)" = /usr/bin/zsh ] || chsh -s /usr/bin/zsh

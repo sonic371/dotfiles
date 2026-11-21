@@ -1,10 +1,11 @@
-#!/usr/bin/env sh
-# create-vm.sh - Create VM from VDI template with conflict handling
+#!/usr/bin/env bash
+# vm-create-new-machine-from-vdi.sh - Create a VirtualBox VM from a VDI template.
+# If a VM or folder with that name already exists, asks before deleting it.
 
 set -e
 
-VM_NAME="$1"
-TEMPLATE="$2"
+VM_NAME="${1:-}"
+TEMPLATE="${2:-}"
 VM_DIR="${HOME}/VirtualBox VMs"
 VM_PATH="$VM_DIR/$VM_NAME"
 
@@ -14,20 +15,37 @@ VM_PATH="$VM_DIR/$VM_NAME"
     exit 1
 }
 
+# The name becomes a folder under "VirtualBox VMs" that may be deleted below, so keep it a plain name
+[[ "$VM_NAME" == */* || "$VM_NAME" == "." || "$VM_NAME" == ".." ]] && {
+    echo "Error: VM name must be a plain name (no '/', not '.' or '..'): $VM_NAME" >&2
+    exit 1
+}
+
 [[ ! -f "$TEMPLATE" ]] && {
     echo "Error: Template not found: $TEMPLATE" >&2
     exit 1
 }
 
+# An existing VM or folder with this name gets deleted for good, so ask first
+vm_exists=0; dir_exists=0
+VBoxManage showvminfo "$VM_NAME" &>/dev/null && vm_exists=1
+[[ -d "$VM_PATH" ]] && dir_exists=1
+if (( vm_exists || dir_exists )); then
+    (( vm_exists ))  && echo "VM '$VM_NAME' already exists (it and its disks will be deleted)." >&2
+    (( dir_exists )) && echo "Folder already exists: $VM_PATH (it will be deleted)." >&2
+    read -rp "Delete and recreate '$VM_NAME'? This cannot be undone. [y/N] " ans
+    [[ $ans == [yY] ]] || { echo "Cancelled, nothing changed." >&2; exit 1; }
+fi
+
 # Clean up any existing VM with same name
-if VBoxManage showvminfo "$VM_NAME" &>/dev/null; then
-    echo "VM '$VM_NAME' exists, unregistering..." >&2
+if (( vm_exists )); then
+    echo "Unregistering and deleting VM '$VM_NAME'..." >&2
     VBoxManage unregistervm "$VM_NAME" --delete 2>/dev/null || true
 fi
 
 # Remove any leftover directory
 if [[ -d "$VM_PATH" ]]; then
-    echo "Cleaning up existing directory: $VM_PATH" >&2
+    echo "Removing folder: $VM_PATH" >&2
     rm -rf "$VM_PATH"
 fi
 

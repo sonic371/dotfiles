@@ -46,17 +46,21 @@ def get_default_audio_devices():
 def generate_dashboard(stats, config, recording=True, error_msg=None):
     """Render the dashboard UI using Rich."""
     status_text = Text()
+    failed = not recording and error_msg is not None
     if recording:
         dot_color = "red" if int(time.time() * 2) % 2 == 0 else "black"
         status_text.append("● ", style=dot_color)
         status_text.append("RECORDING (GPU ACCELERATED)", style="bold red")
+    elif failed:
+        status_text.append("✗ ", style="bold red")
+        status_text.append("RECORDING FAILED", style="bold red")
     else:
         status_text.append("■ ", style="bold green")
         status_text.append("STOPPED / SAVED", style="bold green")
 
     body = Table.grid(expand=True)
     body.add_column()
-    body.add_row(Panel(status_text, expand=False, border_style="bold red" if recording else "bold green"))
+    body.add_row(Panel(status_text, expand=False, border_style="bold red" if (recording or failed) else "bold green"))
 
     sub_grid = Table.grid(expand=True, padding=(0, 2))
     sub_grid.add_column(ratio=1)
@@ -230,6 +234,9 @@ def main():
     )
 
     start_time = time.time()
+    # Set when we ask the recorder to stop (Ctrl+C / SIGTERM). If the recorder
+    # exits without being asked, it failed: it only stops when told to.
+    stop_requested = False
 
     def stop_gsr():
         if process.poll() is None:
@@ -244,6 +251,8 @@ def main():
                     pass
 
     def cleanup_handler(sig, frame):
+        nonlocal stop_requested
+        stop_requested = True
         stop_gsr()
 
     signal.signal(signal.SIGINT, cleanup_handler)
@@ -278,11 +287,40 @@ def main():
         stop_gsr()
         log_file_handle.close()
 
-        console.print(generate_dashboard(stats, config_info, recording=False))
-        if os.path.exists(output_file):
-            sz = os.path.getsize(output_file)
-            size_str = f"{sz / (1024*1024):.2f} MB" if sz > 1024*1024 else f"{sz / 1024:.1f} KB"
-            console.print(f"\n[bold green]✓ Recording saved successfully to:[/bold green] [yellow]{output_file}[/yellow] ({size_str})")
+        # Work out whether this run actually produced a recording
+        problem = None
+        if not stop_requested:
+            problem = f"gpu-screen-recorder quit on its own (exit code {process.returncode})."
+        elif process.returncode not in (0, None):
+            problem = f"gpu-screen-recorder did not stop cleanly (exit code {process.returncode})."
+
+        size = os.path.getsize(output_file) if os.path.exists(output_file) else 0
+        if size == 0 and problem is None:
+            problem = "No video data was written."
+
+        error_msg = None
+        if problem:
+            try:
+                with open(log_path) as f:
+                    tail = "".join(f.readlines()[-15:]).strip()
+            except OSError:
+                tail = ""
+            error_msg = problem + (f"\n\n{tail}" if tail else "") + f"\n\nFull log: {log_path}"
+
+        console.print(generate_dashboard(stats, config_info, recording=False, error_msg=error_msg))
+
+        if size > 0:
+            size_str = f"{size / (1024*1024):.2f} MB" if size > 1024*1024 else f"{size / 1024:.1f} KB"
+            if problem:
+                console.print(f"\n[bold yellow]! A file was written but may be incomplete:[/bold yellow] [yellow]{output_file}[/yellow] ({size_str})")
+            else:
+                console.print(f"\n[bold green]✓ Recording saved successfully to:[/bold green] [yellow]{output_file}[/yellow] ({size_str})")
+        else:
+            if os.path.exists(output_file):
+                os.remove(output_file)  # empty file, nothing worth keeping
+            console.print("\n[bold red]✗ No recording was saved.[/bold red]")
+        if problem:
+            sys.exit(1)
 
 
 if __name__ == "__main__":

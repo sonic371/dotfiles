@@ -167,6 +167,7 @@ def main():
     )
 
     parser.add_argument("--toggle", action="store_true", help="Stop the running recording if there is one, otherwise start recording (for a hotkey)")
+    parser.add_argument("--screen-only", action="store_true", help="Record just the screen: no webcam, microphone or system audio")
     parser.add_argument("-o", "--output", help="Output file path (default: YYYY-MM-DD HH-MM-SS.mp4 in ~/Videos/Recordings)")
     parser.add_argument("-w", "--webcam-device", default="/dev/video0", help="Webcam device path")
     parser.add_argument("--no-webcam", action="store_true", help="Disable webcam Picture-in-Picture overlay")
@@ -186,6 +187,9 @@ def main():
     parser.add_argument("--no-save-script", action="store_true", help="Don't run a script after saving")
 
     args = parser.parse_args()
+
+    if args.screen_only:
+        args.no_webcam = args.no_mic = args.no_system_audio = True
 
     # Without a terminal (hotkey), the dashboard is invisible: use notifications
     use_notify = args.toggle or not sys.stdout.isatty()

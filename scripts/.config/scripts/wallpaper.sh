@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
+# Set a random wallpaper from ~/Pictures/wallpaper (run by change-wallpaper.service)
 
-# Try to find feh in common locations
-if command -v feh >/dev/null 2>&1; then
-    FEH_CMD="feh"
-elif [ -f "/run/current-system/sw/bin/feh" ]; then
-    FEH_CMD="/run/current-system/sw/bin/feh"
-elif [ -f "/usr/bin/feh" ]; then
-    FEH_CMD="/usr/bin/feh"
-else
-    echo "feh not found" >&2
-    exit 1
-fi
+command -v feh >/dev/null 2>&1 || { echo "feh not found" >&2; exit 1; }
 
-# Randomizing wallpapers
-exec "$FEH_CMD" --recursive --randomize --bg-fill ~/Pictures/wallpaper/
+exec feh --recursive --randomize --bg-fill ~/Pictures/wallpaper/

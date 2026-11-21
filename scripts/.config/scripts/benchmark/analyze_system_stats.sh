@@ -1,9 +1,9 @@
 #!/bin/bash
-# sysstat — record system usage, show summary on Ctrl+C
+# analyze_system_stats.sh — record system usage, show summary on Ctrl+C
 # No deps beyond coreutils + procps (top)
 #
-# Usage: ./sysstat                    # record until Ctrl+C, then show summary
-#        ./sysstat path/to/log        # analyze existing log
+# Usage: analyze_system_stats.sh                    # record until Ctrl+C, then show summary
+#        analyze_system_stats.sh path/to/log        # analyze existing log
 
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/sysstat"
 mkdir -p "$CACHE"

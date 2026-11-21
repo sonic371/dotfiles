@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Optimize videos for wallpaper - does one thing well
-# Usage: ./optimize-videos.sh [suffix] [directory]
+# Usage: batch-optimize-vids.sh [suffix] [directory]   (default suffix _optimized, read by check-optimized-vid-stats.sh)
 
-SUFFIX="${1:-_perf_8fps}"
+SUFFIX="${1:-_optimized}"
 DIR="${2:-$HOME/Videos/Hidamari}"
 RES="1920:1200"
 FPS="12"

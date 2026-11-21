@@ -35,8 +35,17 @@ super + s
 super + y
 	~/.config/scripts/dmenu_media.sh
 
+# Show the webcam in a window
 super + w
 	~/.config/scripts/record-webcam.sh
+
+# Screen recording: start, or stop and save (notifications show the state)
+# super+r: screen + webcam + mic + system audio; super+shift+r: screen only
+super + r
+	record --toggle >/dev/null 2>&1
+
+super + shift + r
+	record --toggle --screen-only >/dev/null 2>&1
 
 # Toggle screen layout (laptop-only / laptop-manga)
 super + v

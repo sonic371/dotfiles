@@ -7,8 +7,9 @@
 # CONFIGURATION
 SOCKET="/tmp/mpv-socket"
 SOCAT_CMD="socat"
-FIFO_IN="/tmp/dmenu-nmcli-in" # Reusing FIFOs for consistency
-FIFO_OUT="/tmp/dmenu-nmcli-out"
+FIFO_IN="/tmp/dmenu-media-in"
+FIFO_OUT="/tmp/dmenu-media-out"
+LOCK_FILE="/tmp/dmenu-media-lock"
 MODE_FILE="/tmp/dmenu-media-mode"
 TICKER_FILE="/tmp/dmenu-media-ticker"
 LAST_SONG_FILE="/tmp/dmenu-media-last"
@@ -28,6 +29,14 @@ DMENU_OPTS=(
 # Initialize State
 echo "CONTROLS" > "$MODE_FILE"
 echo 0 > "$TICKER_FILE"
+
+# Helper: Send one full menu update to dmenu. The ticker and the main loop both
+# call this, so build the menu first and write it under a lock to keep the two
+# updates from interleaving.
+push_menu() {
+    local menu=$(show_menu)
+    { flock 9; printf '%s\n\1\n' "$menu" >&3; } 9>"$LOCK_FILE"
+}
 
 # Helper: Send IPC command
 ipc() { echo "$1" | $SOCAT_CMD - "$SOCKET" 2>/dev/null; }
@@ -122,7 +131,10 @@ show_menu() {
     
     local vol_int=${vol%.*}
     local vol_icon=""
-    [[ $vol_int -eq 0 ]] && vol_icon="󰝟" || [[ $vol_int -lt 40 ]] && vol_icon="" || [[ $vol_int -lt 70 ]] && vol_icon=""
+    if (( vol_int == 0 )); then vol_icon="󰝟"
+    elif (( vol_int < 40 )); then vol_icon=""
+    elif (( vol_int < 70 )); then vol_icon=""
+    fi
 
     echo "$icon $scrolled"
     echo "🕒 $(fmt_time $pos) $(draw_bar $pos $dur 15) $(fmt_time $dur)"
@@ -142,12 +154,12 @@ execute_command() {
         "📂 "*) echo "CONTROLS" > "$MODE_FILE" ;;
         "🔍 "*) echo "PLAYLIST" > "$MODE_FILE" ;;
         "🕒 "*) return ;;
+        "󰝚 "*|" "*)  # now-playing line; before the playlist pattern, titles can contain "2:"
+            notify-send -t 2000 "MPV" "Track: $(get_prop 'media-title' | sed 's/ #.*//')\nVol: $(get_prop 'volume')%" ;;
         *[0-9]*:*) 
             local idx=$(echo "$1" | grep -o "[0-9]*:" | head -n1 | tr -d ':')
             cmd "{ \"command\": [\"playlist-play-index\", $((10#$idx - 1))] }"
             echo "CONTROLS" > "$MODE_FILE" ;;
-        "󰝚 "*|" "*) 
-            notify-send -t 2000 "MPV" "Track: $(get_prop 'media-title' | sed 's/ #.*//')\nVol: $(get_prop 'volume')%" ;;
         "⏯️  "*) cmd "cycle pause" ;;
         "⏭️  "*) cmd "playlist-next" ;;
         "⏮️  "*) cmd "playlist-prev" ;;
@@ -185,21 +197,20 @@ exec 4< "$FIFO_OUT"
             # Use song length + 3 spaces for modulo
             [[ -n "$song" ]] && echo $(( (offset + 1) % (${#song} + 3) )) > "$TICKER_FILE"
             
-            show_menu >&3
-            printf "\1\n" >&3
+            push_menu
         fi
     fi
   done
 ) 2>/dev/null &
 TICKER_PID=$!
 
-trap "kill $DMENU_PID $TICKER_PID 2>/dev/null; rm -f $FIFO_IN $FIFO_OUT $MODE_FILE $TICKER_FILE $LAST_SONG_FILE; exit" EXIT
+trap "kill $DMENU_PID $TICKER_PID 2>/dev/null; rm -f $FIFO_IN $FIFO_OUT $LOCK_FILE $MODE_FILE $TICKER_FILE $LAST_SONG_FILE; exit" EXIT
 
 # Initial
-show_menu >&3; printf "\1\n" >&3
+push_menu
 
 while read -r selection <&4; do
     execute_command "$selection"
     sleep 0.1
-    show_menu >&3; printf "\1\n" >&3
+    push_menu
 done

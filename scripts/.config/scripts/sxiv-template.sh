@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-# Select images interactively, get their paths when done
-sxiv -to . -r . | while read -r img; do
-    echo "Selected: $img"
-    # Do something with selected images (copy, move, process)
-done

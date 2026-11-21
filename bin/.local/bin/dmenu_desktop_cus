@@ -1,40 +1,53 @@
-#!/usr/bin/env sh
+#!/bin/bash
+# List desktop applications for dmenu_run_cus, or print the command for one.
+#   dmenu_desktop_cus          rebuild the cache and print app names
+#   dmenu_desktop_cus "Name"   print the command to run for that app (from the cache)
 
 cachedir="${XDG_CACHE_HOME:-"$HOME/.cache"}"
 cache_file="$cachedir/dmenu_desktop_cache"
+terminal="st -e"
 
 [[ ! -e "$cachedir" ]] && mkdir -p "$cachedir"
 
 # If no arguments are passed, it means we should list the applications
 if [[ $# -eq 0 ]]; then
-    # Rebuild cache using pure bash
     > "$cache_file" # Clear the cache file
 
     # Process all desktop files
     while IFS= read -r -d '' desktop_file; do
         local_name=""
         local_exec=""
+        in_entry=0
+        hidden=0
+        in_terminal=0
 
-        # Read file line by line
+        # Read only the [Desktop Entry] section (actions like "New Window" come after it)
         while IFS= read -r line; do
-            # Check for Name= line
-            if [[ -z "$local_name" && "$line" == Name=* ]]; then
-                local_name="${line#Name=}"
+            if [[ "$line" == "["* ]]; then
+                [[ "$line" == "[Desktop Entry]" ]] && { in_entry=1; continue; }
+                (( in_entry )) && break
+                continue
             fi
+            (( in_entry )) || continue
 
-            # Check for Exec= line
-            if [[ -z "$local_exec" && "$line" == Exec=* ]]; then
-                local_exec="${line#Exec=}"
-                # Remove % arguments (space + % + any character)
-                local_exec="${local_exec// %?/ }"
-            fi
-
-            # If we have both, we're done with this file
-            if [[ -n "$local_name" && -n "$local_exec" ]]; then
-                echo "${local_name}|${local_exec}" >> "$cache_file"
-                break
-            fi
+            case "$line" in
+                Name=*)               [[ -z "$local_name" ]] && local_name="${line#Name=}" ;;
+                Exec=*)               [[ -z "$local_exec" ]] && local_exec="${line#Exec=}" ;;
+                NoDisplay=true|Hidden=true) hidden=1 ;;
+                Terminal=true)        in_terminal=1 ;;
+            esac
         done < "$desktop_file"
+
+        # Skip entries meant to stay out of menus (file-type helpers, settings stubs, ...)
+        (( hidden )) && continue
+        [[ -z "$local_name" || -z "$local_exec" ]] && continue
+
+        # Remove % arguments (space + % + any character)
+        local_exec="${local_exec// %?/ }"
+        # Terminal apps (btop, nvim, yazi, ...) need a terminal to show up in
+        (( in_terminal )) && local_exec="$terminal $local_exec"
+
+        echo "${local_name}|${local_exec}" >> "$cache_file"
     done < <(find -L /usr/share/applications ~/.local/share/applications -name "*.desktop" -print0 2>/dev/null)
 
     # Output unique names for dmenu display

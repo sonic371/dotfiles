@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Get commands from dmenu_path (assuming it's in PATH)
-commands=$(dmenu_path_cus | sed 's/^/CMD: /')
+commands=$(dmenu_path | sed 's/^/CMD: /')
 
 # Get desktop applications from dmenu_desktop (assuming it's in PATH)
 applications=$(dmenu_desktop_cus | sed 's/^/APP: /')
@@ -23,8 +23,8 @@ if [ -n "$selected_item" ]; then
         "APP: "*)
             # Extract app name (remove "APP: " prefix)
             app_name=$(printf "%s" "$selected_item" | sed 's/^APP: //')
-            # Get the actual exec command from dmenu_desktop
-            exec_command=$(dmenu_desktop "$app_name")
+            # Get the actual exec command from dmenu_desktop_cus (same script that built the list)
+            exec_command=$(dmenu_desktop_cus "$app_name")
             if [ -n "$exec_command" ]; then
                 ${SHELL:-/bin/sh} -c "$exec_command" &
             fi

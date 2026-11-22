@@ -1,0 +1,87 @@
+diff -up a/slock.c b/slock.c
+--- a/slock.c	2026-07-28 03:28:03.120285888 +0530
++++ b/slock.c	2026-08-03 11:20:35.223992495 +0530
+@@ -6,7 +6,9 @@
+ 
+ #include <ctype.h>
+ #include <errno.h>
++#include <fcntl.h>
+ #include <grp.h>
++#include <limits.h>
+ #include <pwd.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
+@@ -59,7 +61,6 @@ die(const char *errstr, ...)
+ }
+ 
+ #ifdef __linux__
+-#include <fcntl.h>
+ #include <linux/oom.h>
+ 
+ static void
+@@ -301,6 +302,28 @@ lockscreen(Display *dpy, struct xrandr *
+ 	return NULL;
+ }
+ 
++static int
++get_xss_sleep_lock_fd(void)
++{
++	char *env_str, *end;
++	long env_val;
++
++	env_str = getenv("XSS_SLEEP_LOCK_FD");
++	if (!env_str || !*env_str)
++		return -1;
++
++	errno = 0;
++	env_val = strtol(env_str, &end, 10);
++	if (errno ||
++	    *end ||
++	    (env_val < 0 || env_val > INT_MAX)) {
++		fprintf(stderr, "slock: strtol $XSS_SLEEP_LOCK_FD: %s\n",
++		        errno ? strerror(errno) : "invalid value");
++		return -1;
++	}
++	return (int)env_val;
++}
++
+ static void
+ usage(void)
+ {
+@@ -318,6 +341,7 @@ main(int argc, char **argv) {
+ 	const char *hash;
+ 	Display *dpy;
+ 	int s, nlocks, nscreens;
++	int lockfd;
+ 
+ 	ARGBEGIN {
+ 	case 'v':
+@@ -327,6 +351,18 @@ main(int argc, char **argv) {
+ 		usage();
+ 	} ARGEND
+ 
++	lockfd = get_xss_sleep_lock_fd();
++	if (lockfd >= 0) {
++		int flags = fcntl(lockfd, F_GETFD);
++		if (flags < 0) {
++			fprintf(stderr, "slock: fcntl $XSS_SLEEP_LOCK_FD F_GETFD: %s\n",
++			        strerror(errno));
++		} else if (fcntl(lockfd, F_SETFD, flags | FD_CLOEXEC) == -1) {
++			fprintf(stderr, "slock: fcntl $XSS_SLEEP_LOCK_FD F_SETFD: %s\n",
++			        strerror(errno));
++		}
++	}
++
+ 	/* validate drop-user and -group */
+ 	errno = 0;
+ 	if (!(pwd = getpwnam(user)))
+@@ -378,6 +414,9 @@ main(int argc, char **argv) {
+ 	if (nlocks != nscreens)
+ 		return 1;
+ 
++	if (lockfd >= 0 && close(lockfd) < 0)
++		fprintf(stderr, "slock: close $XSS_SLEEP_LOCK_FD: %s\n", strerror(errno));
++
+ 	/* run post-lock command */
+ 	if (argc > 0) {
+ 		pid_t pid;

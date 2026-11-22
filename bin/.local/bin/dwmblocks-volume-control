@@ -1,5 +1,8 @@
-#!/usr/bin/env sh
+#!/bin/bash
 # Volume script using pactl with 150% limit
+
+# Set default terminal if not defined
+TERMINAL="${TERMINAL:-st}"
 
 # Define terminal options
 case "$TERMINAL" in
@@ -31,9 +34,6 @@ case "${BLOCK_BUTTON:-}" in
         ;;
     5) # Scroll down - decrease volume (5%)
         pactl set-sink-volume @DEFAULT_SINK@ -5% 2>/dev/null
-        ;;
-    6) # Other button - edit script
-        ${TERMINAL:-kitty} -e ${EDITOR:-vim} "$0" >/dev/null 2>&1 &
         ;;
 esac
 

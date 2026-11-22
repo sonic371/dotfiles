@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 
 # Set default terminal if not defined
 TERMINAL="${TERMINAL:-st}"

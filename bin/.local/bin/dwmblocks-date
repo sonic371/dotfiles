@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Display the current time in HH:MM:SS.
 
 # Set default terminal if not defined
@@ -32,21 +32,6 @@ case $BLOCK_BUTTON in
                 ;;
         esac
         $TERMINAL "${opts[@]}" -e calcurse >/dev/null 2>&1 &
-        ;;
-    6) 
-        # Define terminal-specific options for window name (editor)
-        case "$TERMINAL" in
-            kitty)
-                opts=(--name "editor")
-                ;;
-            st)
-                opts=(-n "editor")
-                ;;
-            *)
-                opts=()
-                ;;
-        esac
-        $TERMINAL "${opts[@]}" -e "$EDITOR" "$0" >/dev/null 2>&1 &
         ;;
 esac
 

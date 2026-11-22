@@ -59,6 +59,7 @@ systemctl --user add-wants graphical-session.target \
     dunst.service xdg-desktop-portal-gtk.service
 systemctl --user enable \
     change-wallpaper.service dwmblocks.service dwmblocks-musicup.service \
+    dwmblocks-bluetoothup.service \
     fcitx5.service mega-sync.service picom.service sxhkd.service \
     unclutter.service xidlehook.service xss-lock.service \
     battery-alert.timer change-wallpaper.timer

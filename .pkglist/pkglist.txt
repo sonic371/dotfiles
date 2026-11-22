@@ -3,7 +3,7 @@ acpid
 alsa-utils
 amd-ucode
 amdgpu_top
-anki-bin
+anki
 arandr
 audacity
 auto-cpufreq
@@ -25,7 +25,6 @@ chafa
 cool-retro-term
 cozette-otb
 csview
-dillo
 dosfstools
 dunst
 dust
@@ -66,7 +65,7 @@ krita
 lib32-mesa
 lib32-vulkan-radeon
 libinput-gestures
-librewolf-bin
+librewolf
 libxres
 linux
 linux-firmware
@@ -109,7 +108,6 @@ pcmanfm
 picom
 pipewire
 pipewire-alsa
-pipewire-jack
 pipewire-pulse
 playerctl
 poppler
@@ -136,7 +134,6 @@ steam
 stow
 sudo
 sxhkd
-sysstat
 tabiew
 tailscale
 testdisk
@@ -159,12 +156,11 @@ unzip
 upower
 uv
 virtualbox
-virtualbox-host-modules-arch
+virtualbox-host-dkms
 vlc
 vlc-plugins-all
 vulkan-radeon
 vulkan-tools
-webull-desktop
 wget
 wine
 wine-gecko

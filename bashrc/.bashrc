@@ -17,7 +17,6 @@ bash_config_files=(
   vi-mode.bash
   prompt.bash
   dotfiles.bash
-  ssh.bash
 )
 
 # Source each configuration file if it exists.

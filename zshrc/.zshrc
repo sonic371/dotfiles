@@ -17,7 +17,6 @@ zsh_config_files=(
   vi-mode.zsh
   prompt.zsh
   dotfiles.zsh
-  ssh.zsh
   plugins.zsh
 )
 

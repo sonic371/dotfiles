@@ -60,7 +60,6 @@ imagemagick
 iw
 jq
 kdenlive
-keychain
 kitty
 krita
 lib32-mesa

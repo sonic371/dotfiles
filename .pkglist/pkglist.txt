@@ -51,6 +51,7 @@ gallery-dl
 gifsicle
 git
 git-lfs
+github-cli
 glow
 gnumeric
 grub

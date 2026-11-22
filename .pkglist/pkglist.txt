@@ -56,7 +56,6 @@ glow
 gnumeric
 grub
 hip-runtime-amd
-i3lock
 imagemagick
 iw
 jq
@@ -113,7 +112,6 @@ pipewire-alsa
 pipewire-jack
 pipewire-pulse
 playerctl
-polybar
 poppler
 powertop
 proton-ge-custom-bin

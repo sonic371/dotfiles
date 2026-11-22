@@ -8,8 +8,10 @@ if command -v keychain >/dev/null 2>&1; then
     # Otherwise do nothing — run `ssh-init` to start it.
     if [ -z "$SSH_AUTH_SOCK" ] && [ -f "$HOME/.keychain/$HOST-sh" ]; then
         source "$HOME/.keychain/$HOST-sh" 2>/dev/null || true
-        # If the sourced agent is actually dead, clean up
-        if [ -n "$SSH_AGENT_PID" ] && ! kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
+        # If the sourced agent is unreachable (e.g. after a reboot), clean up.
+        # ssh-add -l exits 2 only when it cannot connect to an agent.
+        ssh-add -l >/dev/null 2>&1
+        if [ $? -eq 2 ]; then
             unset SSH_AUTH_SOCK SSH_AGENT_PID
         fi
     fi

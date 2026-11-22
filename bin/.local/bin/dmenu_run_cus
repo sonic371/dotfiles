@@ -3,8 +3,27 @@
 # Get commands from dmenu_path (assuming it's in PATH)
 commands=$(dmenu_path | sed 's/^/CMD: /')
 
-# Get desktop applications from dmenu_desktop (assuming it's in PATH)
+# Get desktop applications from dmenu_desktop_cus (assuming it's in PATH)
 applications=$(dmenu_desktop_cus | sed 's/^/APP: /')
+
+# Programs that desktop files mark as terminal apps (btop, nvim, yazi, ...);
+# dmenu_desktop_cus just wrote them to its cache as "Name|st -e program ..."
+terminal="st -e"
+term_programs=$(sed -n 's/^[^|]*|st -e \([^ ]*\).*/\1/p' "${XDG_CACHE_HOME:-$HOME/.cache}/dmenu_desktop_cache" 2>/dev/null | sed 's|.*/||' | sort -u)
+
+# Run a command line; in a terminal if it ends with ";" or its program is a terminal app
+run() {
+    cmd=$1
+    case "$cmd" in
+        *";") cmd=${cmd%;} ;;
+        *) prog=${cmd%% *}; prog=${prog##*/}
+           if ! printf '%s\n' "$term_programs" | grep -qxF -- "$prog"; then
+               ${SHELL:-/bin/sh} -c "$cmd" &
+               return
+           fi ;;
+    esac
+    $terminal ${SHELL:-/bin/sh} -c "$cmd" &
+}
 
 # Combine lists (apps first since there are fewer of them)
 combined_list=$(printf "%s\n%s\n" "$applications" "$commands")
@@ -18,7 +37,7 @@ if [ -n "$selected_item" ]; then
         "CMD: "*)
             # Extract command name (remove "CMD: " prefix)
             command=$(printf "%s" "$selected_item" | sed 's/^CMD: //')
-            ${SHELL:-/bin/sh} -c "$command" &
+            run "$command"
             ;;
         "APP: "*)
             # Extract app name (remove "APP: " prefix)
@@ -30,8 +49,8 @@ if [ -n "$selected_item" ]; then
             fi
             ;;
         *)
-            # Fallback for anything else
-            ${SHELL:-/bin/sh} -c "$selected_item" &
+            # Typed command (end it with ";" to run it in a terminal)
+            run "$selected_item"
             ;;
     esac
 fi

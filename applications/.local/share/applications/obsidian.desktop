@@ -1,0 +1,4 @@
+[Desktop Entry]
+Name=Obsidian
+Exec=/opt/obsidian/Obsidian.AppImage %f
+Type=Application

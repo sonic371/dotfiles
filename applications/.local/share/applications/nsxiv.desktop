@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=nsxiv
+Comment=Simple image viewer
+Exec=/usr/bin/nsxiv -b -s F %F
+MimeType=image/bmp;image/gif;image/jpeg;image/jpg;image/png;image/tiff;image/webp;
+Categories=Graphics;Viewer;
+Terminal=false

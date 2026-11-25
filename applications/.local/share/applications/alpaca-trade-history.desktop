@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Alpaca Trade History
+Comment=Run trade history script and sync to trade-analyzer
+Exec=st -e zsh -c "cd /home/wade/.local/src/alpaca-dev && uv run python trades_history.py && rsync -avh /home/wade/.local/src/alpaca-dev/data/trade_fills.csv /home/wade/.local/src/trade-analyzer/data/raw/alpaca/trade_fills.csv && bash /home/wade/.local/src/trade-analyzer/start.sh;"
+Icon=utilities-terminal
+Terminal=false
+Categories=Finance;Development;

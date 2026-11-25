@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Alpaca Dash
+Comment=Run Alpaca dashboard
+Exec=st -e zsh -c "cd ~/.local/src/alpaca-dev && uv run python dash.py"
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;

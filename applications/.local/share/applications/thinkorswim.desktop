@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Thinkorswim
+Comment=Trading platform by TD Ameritrade
+Exec=/home/wade/thinkorswim/thinkorswim
+Icon=/home/wade/thinkorswim/.install4j/thinkorswim.png
+Categories=Finance;
+Terminal=false
+StartupWMClass=thinkorswim

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=BlueTui
+Comment=Bluetooth management
+Exec=st -n "bluetui" -e bluetui
+Icon=bluetooth
+Terminal=false
+Categories=Network;System;

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=ScreenKey Desktop
+Comment=Display keystrokes on screen
+Exec=screenkey --position fixed --geometry 600x150+1250+1000 --mouse --mouse-fade 0.3 --opacity 0.5 --persist --window
+Icon=screenkey
+Terminal=false
+Type=Application
+Categories=Utility;Accessibility;
+StartupNotify=false

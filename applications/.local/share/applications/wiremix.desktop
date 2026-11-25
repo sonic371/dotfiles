@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=WireMix
+Comment=Wireless network management
+Exec=st -n "wiremix" -e wiremix
+Icon=network-wireless
+Terminal=false
+Categories=Network;System;

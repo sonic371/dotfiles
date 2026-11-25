@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=NmTui
+Comment=Wireless network management
+Exec=st -n "nmtui" -e nmtui
+Icon=network-wireless
+Terminal=false
+Categories=Network;System;

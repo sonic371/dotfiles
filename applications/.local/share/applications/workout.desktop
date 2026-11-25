@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Workout Video
+Comment=Play workout video
+Exec=mpv --x11-name=workout --volume=35 /home/wade/Downloads/workout.mp4
+Icon=video-x-generic
+Terminal=false
+Categories=AudioVideo;Player;

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Hidamari Background
+Comment=Play low_fps videos as animated wallpaper
+Exec=bash -c "xwinwrap -ni -nf -b -un -s -fs -ovr -d -- mpv -wid WID --osc=no --fs=yes --shuffle --loop-playlist=inf /home/wade/Videos/Hidamari/"
+TryExec=xwinwrap
+Categories=Utility;Graphics;
+StartupNotify=false
+Terminal=false

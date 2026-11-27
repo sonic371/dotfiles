@@ -70,16 +70,26 @@ batchcomp() {
     done
 }
 
-# Export aur diffs
+# Export aur diffs (installed version -> latest AUR)
+# Diffs from the commit whose .SRCINFO matches the installed version, not HEAD:
+# paru may already have pulled the new commits into the clone.
 aurdiff() {
-  local d=~/pkgbuild-diffs clone p
+  local d=~/pkgbuild-diffs p v ver rel base clone h s from
   mkdir -p "$d"
   rm -f "$d"/*.diff(N)                       # clear old diffs (N = safe when none exist)
   for p in $(paru -Qua | awk '{print $1}'); do
-    clone=~/.cache/paru/clone/"$p"
-    [ -d "$clone" ] || continue
-    git -C "$clone" fetch -q 2>/dev/null     # pull fresh commits, don't touch working tree
-    git -C "$clone" diff HEAD origin/master > "$d/$p.diff"   # incoming = new vs. currently-installed
+    base=$(pacman -Qi "$p" | awk -F': ' '/^Base/{print $2}')   # split pkgs: clone is named after pkgbase
+    clone=~/.cache/paru/clone/"${base:-$p}"
+    [ -d "$clone" ] || { echo "no clone: $p"; continue; }
+    git -C "$clone" fetch -q || { echo "fetch failed: $p"; continue; }
+    v=$(pacman -Q "$p" | awk '{print $2}'); v=${v#*:}          # drop epoch
+    ver=${v%-*} rel=${v##*-} from=
+    for h in $(git -C "$clone" rev-list origin/master -- .SRCINFO); do
+      s=$(git -C "$clone" show "$h:.SRCINFO")
+      grep -qx $'\tpkgver = '"$ver" <<<"$s" && grep -qx $'\tpkgrel = '"$rel" <<<"$s" && { from=$h; break; }
+    done
+    [ -n "$from" ] || { echo "installed $v not in history: $p"; continue; }
+    git -C "$clone" diff "$from" origin/master -- . ':!.SRCINFO' > "$d/$p.diff"
   done
   ls -la "$d"
 }
